@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORIGAMI — Produit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#0a0a0a; --white:#f8f6f3;
+    --grey-light:#e8e5e0; --grey-mid:#b0aba3; --grey-dark:#3a3835;
+    --red:#8b0000;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--white);color:var(--black);font-family:'Josefin Sans',sans-serif;font-weight:300;letter-spacing:.04em;cursor:none;}
+
+  /* CURSOR */
+  .cursor{position:fixed;width:10px;height:10px;background:var(--black);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+  .cursor-ring{position:fixed;width:36px;height:36px;border:1px solid var(--black);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.5;}
+
+  /* HEADER */
+  header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(248,246,243,.97);border-bottom:1px solid var(--grey-light);padding:0 3rem;backdrop-filter:blur(12px);}
+  .header-top{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--black);}
+  .logo-img{height:44px;mix-blend-mode:multiply;}
+  .logo-text{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.4rem;letter-spacing:.3em;}
+  .back-btn{display:flex;align-items:center;gap:.5rem;text-decoration:none;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--grey-mid);transition:color .3s;cursor:none;}
+  .back-btn svg{width:14px;height:14px;}
+  .back-btn:hover{color:var(--black);}
+
+  /* BREADCRUMB */
+  .breadcrumb{padding:1rem 3rem;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--grey-mid);display:flex;gap:.8rem;align-items:center;margin-top:64px;border-bottom:1px solid var(--grey-light);}
+  .breadcrumb a{color:var(--grey-mid);text-decoration:none;transition:color .3s;cursor:none;}
+  .breadcrumb a:hover{color:var(--black);}
+  .breadcrumb span{color:var(--grey-light);}
+
+  /* PRODUCT LAYOUT */
+  .product-page{display:grid;grid-template-columns:auto 1fr 1fr;gap:0;min-height:calc(100vh - 110px);}
+
+  /* THUMBNAILS STRIP */
+  .thumb-strip{width:80px;padding:1.5rem .8rem;display:flex;flex-direction:column;gap:.5rem;border-right:1px solid var(--grey-light);overflow-y:auto;max-height:calc(100vh - 110px);position:sticky;top:110px;}
+  .thumb{width:64px;height:80px;object-fit:cover;cursor:none;border:2px solid transparent;transition:border-color .25s,opacity .25s;opacity:.6;flex-shrink:0;background:var(--grey-light);}
+  .thumb.active,.thumb:hover{border-color:var(--black);opacity:1;}
+  .thumb-placeholder{width:64px;height:80px;background:var(--grey-light);display:flex;align-items:center;justify-content:center;cursor:none;border:2px solid transparent;transition:border-color .25s,opacity .25s;opacity:.6;flex-shrink:0;}
+  .thumb-placeholder:hover,.thumb-placeholder.active{border-color:var(--black);opacity:1;}
+
+  /* MAIN IMAGE */
+  .main-img-wrap{position:sticky;top:64px;height:calc(100vh - 64px);overflow:hidden;background:var(--grey-light);display:flex;align-items:center;justify-content:center;}
+  .main-img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:opacity .4s;}
+  .main-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--grey-light);}
+
+  /* PRODUCT INFO */
+  .product-info-panel{padding:3rem 2.5rem 4rem;overflow-y:auto;}
+
+  .product-tag-top{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .9rem;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1.2rem;}
+  .product-tag-top.new{background:var(--black);color:var(--white);}
+  .product-tag-top.promo{background:var(--red);color:var(--white);}
+
+  .product-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:300;line-height:1.05;margin-bottom:.5rem;}
+
+  .product-brand-line{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grey-mid);margin-bottom:1.5rem;}
+
+  .product-price-wrap{display:flex;align-items:baseline;gap:.8rem;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--grey-light);}
+  .price-main{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;}
+  .price-original{font-family:'Cormorant Garamond',serif;font-size:1.2rem;text-decoration:line-through;color:var(--grey-mid);}
+  .price-save{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);padding:.2rem .6rem;border:1px solid var(--red);}
+
+  /* COLORS */
+  .option-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grey-dark);margin-bottom:.8rem;display:flex;justify-content:space-between;}
+  .option-label span{color:var(--grey-mid);}
+  .colors-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.8rem;}
+  .color-swatch{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:none;transition:transform .2s,border-color .2s;position:relative;}
+  .color-swatch:hover{transform:scale(1.15);}
+  .color-swatch.active{border-color:var(--black);}
+  .color-swatch.active::after{content:'';position:absolute;inset:-4px;border:1px solid var(--black);border-radius:50%;}
+
+  /* SIZES */
+  .sizes-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2rem;}
+  .size-btn{min-width:44px;height:44px;border:1px solid var(--grey-light);background:none;font-family:'Josefin Sans',sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grey-dark);cursor:none;transition:all .2s;padding:0 .6rem;}
+  .size-btn:hover{border-color:var(--black);color:var(--black);}
+  .size-btn.active{background:var(--black);color:var(--white);border-color:var(--black);}
+  .size-btn.unavail{opacity:.3;text-decoration:line-through;pointer-events:none;}
+
+  /* QUANTITY */
+  .qty-wrap{display:flex;align-items:center;gap:0;margin-bottom:1.5rem;width:fit-content;border:1px solid var(--grey-light);}
+  .qty-btn{width:40px;height:40px;background:none;border:none;cursor:none;font-size:1.1rem;color:var(--grey-dark);transition:background .2s,color .2s;display:flex;align-items:center;justify-content:center;}
+  .qty-btn:hover{background:var(--black);color:var(--white);}
+  .qty-num{width:50px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;border:none;outline:none;background:none;font-weight:300;}
+
+  /* ACTION BUTTONS */
+  .action-btns{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem;}
+  .btn-order{padding:1.1rem 2rem;background:var(--black);color:var(--white);border:none;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;cursor:none;transition:background .3s;display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;}
+  .btn-order:hover{background:#2a2a2a;}
+  .btn-cart{padding:1.1rem 2rem;background:none;color:var(--black);border:1px solid var(--black);font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;cursor:none;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;}
+  .btn-cart:hover{background:var(--black);color:var(--white);}
+  .btn-order svg,.btn-cart svg{width:14px;height:14px;}
+
+  /* DELIVERY INFO */
+  .delivery-info{display:flex;flex-direction:column;gap:.6rem;padding:1.2rem 0;border-top:1px solid var(--grey-light);border-bottom:1px solid var(--grey-light);margin-bottom:2rem;}
+  .delivery-row{display:flex;align-items:center;gap:.7rem;font-size:.6rem;letter-spacing:.08em;color:var(--grey-dark);}
+  .delivery-row svg{width:14px;height:14px;flex-shrink:0;color:var(--grey-mid);}
+
+  /* TABS */
+  .tabs-bar{display:flex;gap:0;border-bottom:1px solid var(--grey-light);margin-bottom:1.5rem;}
+  .tab-btn{padding:.8rem 1.5rem;background:none;border:none;border-bottom:2px solid transparent;font-family:'Josefin Sans',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--grey-mid);cursor:none;transition:all .25s;margin-bottom:-1px;}
+  .tab-btn.active{color:var(--black);border-bottom-color:var(--black);}
+  .tab-panel{display:none;font-size:.7rem;line-height:2;color:var(--grey-dark);letter-spacing:.05em;}
+  .tab-panel.active{display:block;}
+  .tab-panel ul{padding-left:1.2rem;margin-top:.5rem;}
+  .tab-panel ul li{margin-bottom:.3rem;}
+
+  /* YOU MAY ALSO LIKE */
+  .also-like{padding:4rem 3rem;border-top:1px solid var(--grey-light);}
+  .section-label{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--grey-mid);margin-bottom:.8rem;display:flex;align-items:center;gap:1rem;}
+  .section-label::before{content:'';width:2rem;height:1px;background:var(--grey-mid);}
+  .section-title{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(1.8rem,3vw,3rem);line-height:1;margin-bottom:2.5rem;}
+  .section-title em{font-style:italic;}
+  .also-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;}
+  .also-card{cursor:none;position:relative;}
+  .also-img-wrap{aspect-ratio:3/4;background:var(--grey-light);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;}
+  .also-img-wrap:hover img{transform:scale(1.05);}
+  .also-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;}
+  .also-quick{position:absolute;bottom:0;left:0;right:0;background:var(--white);color:var(--black);border:none;padding:.8rem;font-family:'Josefin Sans',sans-serif;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;cursor:none;transform:translateY(100%);transition:transform .3s;z-index:2;}
+  .also-card:hover .also-quick{transform:translateY(0);}
+  .also-info{padding:.9rem .5rem 1.2rem;}
+  .also-name{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:300;display:block;margin-bottom:.3rem;}
+  .also-price{font-family:'Cormorant Garamond',serif;font-size:.9rem;}
+
+  /* ORDER MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,10,10,.6);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(6px);}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--white);width:min(560px,95vw);max-height:90vh;overflow-y:auto;padding:0;animation:slideUp .35s ease;}
+  .modal-header{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--grey-light);display:flex;justify-content:space-between;align-items:flex-start;}
+  .modal-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;}
+  .modal-subtitle{font-size:.6rem;letter-spacing:.1em;color:var(--grey-mid);margin-top:.3rem;}
+  .modal-close{background:none;border:none;cursor:none;font-size:1.2rem;color:var(--grey-mid);transition:color .3s;line-height:1;}
+  .modal-close:hover{color:var(--black);}
+  .modal-body{padding:1.8rem 2rem;}
+  .modal-summary{background:#f2efe9;padding:1rem 1.2rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;}
+  .modal-product-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;}
+  .modal-product-detail{font-size:.58rem;letter-spacing:.1em;color:var(--grey-mid);margin-top:.2rem;}
+  .modal-product-price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;text-align:right;}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+  .form-row.full{grid-template-columns:1fr;}
+  .form-group{display:flex;flex-direction:column;gap:.4rem;}
+  .form-label{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--grey-dark);}
+  .form-input,.form-select,.form-textarea{padding:.8rem 1rem;border:1px solid var(--grey-light);background:none;font-family:'Josefin Sans',sans-serif;font-size:.7rem;color:var(--black);outline:none;transition:border-color .25s;width:100%;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--black);}
+  .form-textarea{resize:vertical;min-height:80px;}
+  .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b0aba3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
+
+  .form-divider{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grey-mid);padding:.8rem 0;border-top:1px solid var(--grey-light);border-bottom:1px solid var(--grey-light);margin:1.2rem 0;}
+
+  .modal-footer{padding:1.5rem 2rem 2rem;border-top:1px solid var(--grey-light);}
+  .btn-confirm{width:100%;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;cursor:none;transition:background .3s;display:flex;align-items:center;justify-content:center;gap:.6rem;}
+  .btn-confirm:hover{background:#333;}
+  .btn-confirm svg{width:14px;height:14px;}
+
+  /* SUCCESS STATE */
+  .order-success{display:none;text-align:center;padding:3rem 2rem;}
+  .order-success.show{display:block;}
+  .success-icon{font-size:3rem;margin-bottom:1rem;}
+  .success-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:.5rem;}
+  .success-sub{font-size:.65rem;letter-spacing:.1em;color:var(--grey-mid);}
+
+  /* NOTIFICATION */
+  .notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--black);color:var(--white);padding:1rem 2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;z-index:300;transition:transform .4s cubic-bezier(.76,0,.24,1);white-space:nowrap;}
+  .notification.show{transform:translateX(-50%) translateY(0);}
+
+  /* RESPONSIVE */
+  @media(max-width:1024px){
+    .product-page{grid-template-columns:64px 1fr 1fr;}
+    .also-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  @media(max-width:768px){
+    header,footer{padding:0 1.5rem;}
+    .product-page{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
+    .thumb-strip{flex-direction:row;width:100%;max-height:none;overflow-x:auto;border-right:none;border-bottom:1px solid var(--grey-light);padding:.8rem 1rem;position:static;}
+    .main-img-wrap{height:70vw;position:static;}
+    .product-info-panel{padding:2rem 1.5rem;}
+    .also-grid{grid-template-columns:repeat(2,1fr);}
+    .also-like{padding:3rem 1.5rem;}
+    .form-row{grid-template-columns:1fr;}
+    body{cursor:auto;}
+    .cursor,.cursor-ring{display:none;}
+  }
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="notification" id="notification"></div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal" id="modalBox">
+    <div id="orderForm">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Commander</div>
+          <div class="modal-subtitle">Remplissez vos informations de livraison</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Product summary -->
+        <div class="modal-summary">
+          <div>
+            <div class="modal-product-name" id="modalProdName">—</div>
+            <div class="modal-product-detail" id="modalProdDetail">—</div>
+          </div>
+          <div class="modal-product-price" id="modalProdPrice">—</div>
+        </div>
+
+        <div class="form-divider">Informations personnelles</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Prénom *</label>
+            <input class="form-input" id="fPrenom" type="text" placeholder="Votre prénom" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom *</label>
+            <input class="form-input" id="fNom" type="text" placeholder="Votre nom" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Téléphone *</label>
+            <input class="form-input" id="fTel" type="tel" placeholder="06 XX XX XX XX" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp</label>
+            <input class="form-input" id="fWa" type="tel" placeholder="(si différent)">
+          </div>
+        </div>
+
+        <div class="form-divider">Adresse de livraison</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Wilaya *</label>
+            <select class="form-select" id="fWilaya">
+              <option value="">— Choisir la wilaya —</option>
+              <option>Alger</option><option>Oran</option><option>Constantine</option>
+              <option>Annaba</option><option>Blida</option><option>Batna</option>
+              <option>Sétif</option><option>Sidi Bel Abbès</option><option>Biskra</option>
+              <option>Tébessa</option><option>Tlemcen</option><option>Béjaïa</option>
+              <option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
+              <option>Mascara</option><option>Ouargla</option><option>Tizi Ouzou</option>
+              <option>Jijel</option><option>Skikda</option><option>Guelma</option>
+              <option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option>
+              <option>Tiaret</option><option>Bejaia</option><option>Bordj Bou Arreridj</option>
+              <option>Boumerdès</option><option>El Tarf</option><option>Tissemsilt</option>
+              <option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option>
+              <option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
+              <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option>
+              <option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option>
+              <option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option>
+              <option>In Guezzam</option><option>Touggourt</option><option>Djanet</option>
+              <option>El M'Ghair</option><option>El Meniaa</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Adresse complète *</label>
+            <input class="form-input" id="fAdresse" type="text" placeholder="Rue, quartier, commune…" required>
+          </div>
+        </div>
+
+        <div class="form-divider">Détails de la commande</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Couleur</label>
+            <input class="form-input" id="fColor" type="text" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Taille</label>
+            <input class="form-input" id="fSize" type="text" readonly>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Quantité</label>
+            <input class="form-input" id="fQty" type="number" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total estimé</label>
+            <input class="form-input" id="fTotal" type="text" readonly>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Note (optionnel)</label>
+            <textarea class="form-textarea" id="fNote" placeholder="Précisions sur votre commande…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-confirm" onclick="submitOrder()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmer la commande
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="order-success" id="orderSuccess">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Commande reçue !</div>
+      <p class="success-sub">Merci pour votre confiance.<br>Notre équipe vous contactera sous 24h pour confirmer.</p>
+      <br>
+      <button class="btn-order" onclick="closeModal()" style="display:inline-flex;width:auto;padding:1rem 2rem;margin-top:1rem;">
+        Continuer mes achats
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <a href="index.html" class="logo">
+      <img src="574978275_4260126607599725_2794783614384322684_n.jpg" alt="ORIGAMI" class="logo-img">
+      <span class="logo-text">ORIGAMI</span>
+    </a>
+    <a href="javascript:history.back()" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Retour
+    </a>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html">Accueil</a>
+  <span>/</span>
+  <a href="javascript:history.back()" id="bcCategory">Catégorie</a>
+  <span>/</span>
+  <a href="#" id="bcProduct" style="color:var(--black)">Produit</a>
+</div>
+
+<!-- PRODUCT PAGE -->
+<div class="product-page">
+
+  <!-- THUMBNAIL STRIP -->
+  <div class="thumb-strip" id="thumbStrip"></div>
+
+  <!-- MAIN IMAGE -->
+  <div class="main-img-wrap" id="mainImgWrap">
+    <div class="main-img-placeholder" id="mainImgEl" style="background:var(--grey-light);">
+      <svg viewBox="0 0 120 120" width="80" height="80" fill="none" opacity=".2">
+        <polygon points="60,8 112,100 8,100" stroke="#0a0a0a" stroke-width="1.5" fill="none"/>
+        <polygon points="60,30 90,90 30,90" stroke="#0a0a0a" stroke-width=".8" fill="none"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- INFO PANEL -->
+  <div class="product-info-panel">
+    <div id="prodTagWrap"></div>
+    <h1 class="product-title" id="prodTitle">Chargement…</h1>
+    <div class="product-brand-line" id="prodBrand">ORIGAMI</div>
+
+    <div class="product-price-wrap">
+      <span class="price-main" id="prodPrice">—</span>
+      <span class="price-original" id="prodOriginal" style="display:none"></span>
+      <span class="price-save" id="prodSave" style="display:none"></span>
+    </div>
+
+    <!-- COLORS -->
+    <div id="colorsSection">
+      <div class="option-label">Couleur <span id="selectedColorName">—</span></div>
+      <div class="colors-row" id="colorsRow"></div>
+    </div>
+
+    <!-- SIZES -->
+    <div id="sizesSection">
+      <div class="option-label" style="margin-bottom:.5rem;">
+        Taille <span id="selectedSizeName">—</span>
+        <a href="#" style="font-size:.55rem;letter-spacing:.1em;color:var(--grey-mid);cursor:none;">Guide des tailles</a>
+      </div>
+      <div class="sizes-row" id="sizesRow"></div>
+    </div>
+
+    <!-- QTY -->
+    <div class="option-label">Quantité</div>
+    <div class="qty-wrap">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <input class="qty-num" id="qtyNum" type="number" value="1" min="1" onchange="clampQty()">
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="action-btns" style="margin-top:1.2rem;">
+      <button class="btn-order" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Commander maintenant
+      </button>
+      <button class="btn-cart" onclick="addedToCart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Ajouter au panier
+      </button>
+    </div>
+
+    <!-- DELIVERY -->
+    <div class="delivery-info">
+      <div class="delivery-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Livraison dans toute l'Algérie
+      </div>
+      <div class="delivery-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        Paiement à la livraison disponible
+      </div>
+      <div class="delivery-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Retour gratuit sous 7 jours
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('desc',this)">Description</button>
+      <button class="tab-btn" onclick="switchTab('mat',this)">Matières</button>
+      <button class="tab-btn" onclick="switchTab('care',this)">Entretien</button>
+    </div>
+    <div class="tab-panel active" id="tab-desc" id="prodDesc">
+      <p id="prodDescText">Description du produit.</p>
+    </div>
+    <div class="tab-panel" id="tab-mat">
+      <ul>
+        <li id="mat1">100% coton premium</li>
+        <li id="mat2">Doublure en viscose</li>
+        <li id="mat3">Finitions main</li>
+      </ul>
+    </div>
+    <div class="tab-panel" id="tab-care">
+      <ul>
+        <li>Lavage à 30°C maximum</li>
+        <li>Ne pas utiliser de sèche-linge</li>
+        <li>Repassage à basse température</li>
+        <li>Nettoyage à sec possible</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- YOU MAY ALSO LIKE -->
+<section class="also-like">
+  <div class="section-label">Découvrir</div>
+  <h2 class="section-title">Vous aimerez<br><em>aussi</em></h2>
+  <div class="also-grid" id="alsoGrid"></div>
+</section>
+
+<script>
+  // ─── Read product from URL ────────────────────────────────────────────────────
+  const params = new URLSearchParams(location.search);
+  const STORAGE_KEY = 'origami_data';
+
+  function loadData() {
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) return JSON.parse(s); } catch(e){}
+    return null;
+  }
+
+  const data = loadData();
+  const allProducts = data?.products || [];
+  const prodId = parseInt(params.get('id'));
+  const catParam = params.get('cat') || '';
+
+  // Find product or use demo
+  let product = allProducts.find(p => p.id === prodId) || null;
+
+  // Demo product if none found
+  if (!product) {
+    product = {
+      id: 0,
+      name: params.get('name') || 'Produit ORIGAMI',
+      brand: 'ORIGAMI',
+      price: parseFloat(params.get('price')) || 2500,
+      originalPrice: parseFloat(params.get('orig')) || null,
+      tag: params.get('tag') || null,
+      description: 'Pièce emblématique de la collection ORIGAMI 2026. Confectionnée avec soin pour allier élégance et confort au quotidien.',
+      colors: [
+        {name:'Noir',hex:'#0a0a0a'},{name:'Blanc',hex:'#f8f6f3'},{name:'Beige',hex:'#d4c9b8'}
+      ],
+      tailles: ['XS','S','M','L','XL','XXL'],
+      photos: [],
+      category: catParam,
+    };
+  }
+
+  // ─── Render Product ────────────────────────────────────────────────────────────
+  document.title = `ORIGAMI — ${product.name}`;
+  document.getElementById('bcProduct').textContent = product.name;
+  if (catParam) document.getElementById('bcCategory').textContent = catParam.replace(/-/g,' ');
+  document.getElementById('prodTitle').textContent = product.name;
+  document.getElementById('prodBrand').textContent = product.brand || 'ORIGAMI';
+
+  // Tag
+  if (product.tag) {
+    const tagEl = document.getElementById('prodTagWrap');
+    tagEl.innerHTML = `<span class="product-tag-top ${product.tag.toLowerCase() === 'sale' ? 'promo' : 'new'}">${product.tag}</span>`;
+  }
+
+  // Price
+  document.getElementById('prodPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
+  if (product.originalPrice) {
+    const origEl = document.getElementById('prodOriginal');
+    origEl.textContent = `${product.originalPrice.toLocaleString()} DA`;
+    origEl.style.display = '';
+    const save = Math.round((1 - product.price/product.originalPrice)*100);
+    const saveEl = document.getElementById('prodSave');
+    saveEl.textContent = `-${save}%`;
+    saveEl.style.display = '';
+  }
+
+  // Description
+  if (product.description) document.getElementById('prodDescText').textContent = product.description;
+
+  // ─── Photos / Thumbnails ──────────────────────────────────────────────────────
+  const photos = product.photos?.length ? product.photos : [];
+  const colors = product.colors?.length ? product.colors : [{name:'',hex:'#d4d0ca'}];
+  const thumbStrip = document.getElementById('thumbStrip');
+  const mainWrap = document.getElementById('mainImgEl');
+
+  function setMainImage(src, color) {
+    mainWrap.innerHTML = src
+      ? `<img src="${src}" class="main-img" alt="${product.name}">`
+      : `<div style="width:100%;height:100%;background:${color||'#d4d0ca'};display:flex;align-items:center;justify-content:center;">
+           <svg viewBox="0 0 120 120" width="100" height="100" fill="none" opacity=".15">
+             <polygon points="60,8 112,100 8,100" stroke="#0a0a0a" stroke-width="1.5" fill="none"/>
+           </svg>
+         </div>`;
+  }
+
+  if (photos.length > 0) {
+    photos.forEach((src, i) => {
+      const el = document.createElement('img');
+      el.src = src; el.className = 'thumb' + (i===0?' active':''); el.alt = `Vue ${i+1}`;
+      el.onclick = () => { document.querySelectorAll('.thumb,.thumb-placeholder').forEach(t=>t.classList.remove('active')); el.classList.add('active'); setMainImage(src, null); };
+      thumbStrip.appendChild(el);
+    });
+    setMainImage(photos[0], null);
+  } else {
+    // Color-based thumbnails
+    colors.forEach((c, i) => {
+      const el = document.createElement('div');
+      el.className = 'thumb-placeholder' + (i===0?' active':'');
+      el.style.background = c.hex;
+      el.title = c.name;
+      el.onclick = () => {
+        document.querySelectorAll('.thumb,.thumb-placeholder').forEach(t=>t.classList.remove('active'));
+        el.classList.add('active');
+        setMainImage(c.image||null, c.hex);
+        // Sync color swatch
+        document.querySelectorAll('.color-swatch').forEach((s,j)=>s.classList.toggle('active',j===i));
+        document.getElementById('selectedColorName').textContent = c.name;
+        selectedColor = c.name;
+      };
+      thumbStrip.appendChild(el);
+    });
+    setMainImage(colors[0].image||null, colors[0].hex);
+  }
+
+  // ─── Colors ────────────────────────────────────────────────────────────────────
+  let selectedColor = colors[0]?.name || '';
+  const colorsRow = document.getElementById('colorsRow');
+  document.getElementById('selectedColorName').textContent = selectedColor;
+  colors.forEach((c, i) => {
+    const sw = document.createElement('button');
+    sw.className = 'color-swatch' + (i===0?' active':'');
+    sw.style.background = c.hex;
+    sw.title = c.name;
+    sw.onclick = () => {
+      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
+      sw.classList.add('active');
+      selectedColor = c.name;
+      document.getElementById('selectedColorName').textContent = c.name;
+      // Sync thumbnail
+      const thumbs = document.querySelectorAll('.thumb,.thumb-placeholder');
+      if (thumbs[i]) { thumbs.forEach(t=>t.classList.remove('active')); thumbs[i].classList.add('active'); }
+      if (photos.length===0) setMainImage(c.image||null, c.hex);
+    };
+    colorsRow.appendChild(sw);
+  });
+
+  // ─── Sizes ─────────────────────────────────────────────────────────────────────
+  let selectedSize = '';
+  const tailles = product.tailles?.length ? product.tailles : ['XS','S','M','L','XL'];
+  const sizesRow = document.getElementById('sizesRow');
+  tailles.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'size-btn';
+    btn.textContent = t;
+    btn.onclick = () => {
+      document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedSize = t;
+      document.getElementById('selectedSizeName').textContent = t;
+    };
+    sizesRow.appendChild(btn);
+  });
+
+  // ─── Quantity ─────────────────────────────────────────────────────────────────
+  function changeQty(d) {
+    const el = document.getElementById('qtyNum');
+    el.value = Math.max(1, parseInt(el.value||1) + d);
+  }
+  function clampQty() {
+    const el = document.getElementById('qtyNum');
+    el.value = Math.max(1, parseInt(el.value)||1);
+  }
+
+  // ─── Tabs ─────────────────────────────────────────────────────────────────────
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ─── Add to cart notification ─────────────────────────────────────────────────
+  function addedToCart() {
+    notify(`${product.name} ajouté au panier`);
+  }
+
+  // ─── Order Modal ──────────────────────────────────────────────────────────────
+  function openModal() {
+    const qty = parseInt(document.getElementById('qtyNum').value)||1;
+    const total = (product.price * qty).toLocaleString();
+    document.getElementById('modalProdName').textContent = product.name;
+    document.getElementById('modalProdDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+    document.getElementById('modalProdPrice').textContent = `${total} DA`;
+    document.getElementById('fColor').value = selectedColor;
+    document.getElementById('fSize').value = selectedSize;
+    document.getElementById('fQty').value = qty;
+    document.getElementById('fTotal').value = `${total} DA`;
+    document.getElementById('orderModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('orderModal').classList.remove('open');
+    document.body.style.overflow = '';
+    // Reset success state
+    setTimeout(() => {
+      document.getElementById('orderForm').style.display = '';
+      document.getElementById('orderSuccess').classList.remove('show');
+    }, 400);
+  }
+  document.getElementById('orderModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('orderModal')) closeModal();
+  });
+
+  // Update total when qty changes in form
+  document.getElementById('fQty').addEventListener('input', () => {
+    const q = parseInt(document.getElementById('fQty').value)||1;
+    document.getElementById('fTotal').value = `${(product.price * q).toLocaleString()} DA`;
+    document.getElementById('modalProdDetail').textContent = [selectedColor, selectedSize, `Qté: ${q}`].filter(Boolean).join(' · ');
+  });
+
+  function submitOrder() {
+    const prenom = document.getElementById('fPrenom').value.trim();
+    const nom = document.getElementById('fNom').value.trim();
+    const tel = document.getElementById('fTel').value.trim();
+    const wilaya = document.getElementById('fWilaya').value;
+    const adresse = document.getElementById('fAdresse').value.trim();
+    if (!prenom || !nom || !tel || !wilaya || !adresse) {
+      notify('Veuillez remplir tous les champs obligatoires (*)');
+      return;
+    }
+    // Show success
+    document.getElementById('orderForm').style.display = 'none';
+    document.getElementById('orderSuccess').classList.add('show');
+  }
+
+  // ─── Also Like ────────────────────────────────────────────────────────────────
+  // Prioritize same category, then fill with others
+  const samecat = allProducts.filter(p => p.id !== prodId && p.category === product.category);
+  const others  = allProducts.filter(p => p.id !== prodId && p.category !== product.category);
+  const alsoProducts = [...samecat, ...others].slice(0, 5);
+  const alsoGrid = document.getElementById('alsoGrid');
+
+  function renderAlsoCard(p) {
+    const firstPhoto = p.photos?.[0] || p.colors?.find(c=>c.image)?.image || null;
+    const firstColor = p.colors?.[0]?.hex || '#d4d0ca';
+    const imgHTML = firstPhoto
+      ? `<img src="${firstPhoto}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+      : `<div style="width:100%;height:100%;background:${firstColor};position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+           <svg viewBox="0 0 120 120" width="50" height="50" fill="none" opacity=".15">
+             <polygon points="60,8 112,100 8,100" stroke="#0a0a0a" stroke-width="1.5" fill="none"/>
+           </svg>
+         </div>`;
+    const tagBadge = p.tag ? `<span style="position:absolute;top:.7rem;left:.7rem;background:${p.tag.toLowerCase()==='sale'?'#8b0000':'#0a0a0a'};color:#f8f6f3;font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;padding:.25rem .6rem;z-index:2">${p.tag}</span>` : '';
+    const priceHTML = p.originalPrice
+      ? `<span style="font-size:.75rem;text-decoration:line-through;color:#b0aba3;margin-right:.3rem">${p.originalPrice.toLocaleString()} DA</span><span style="color:#c0392b">${(p.price||0).toLocaleString()} DA</span>`
+      : `${(p.price||0).toLocaleString()} DA`;
+    return `
+      <div class="also-card" onclick="location.href='product.html?id=${p.id}&cat=${encodeURIComponent(p.category||'')}'" style="cursor:none">
+        <div class="also-img-wrap">
+          ${imgHTML}${tagBadge}
+          <button class="also-quick" onclick="event.stopPropagation();location.href='product.html?id=${p.id}'">Voir le produit →</button>
+        </div>
+        <div class="also-info">
+          <span class="also-name">${p.name}</span>
+          <span class="also-price">${priceHTML}</span>
+        </div>
+      </div>`;
+  }
+
+  if (alsoProducts.length > 0) {
+    alsoGrid.innerHTML = alsoProducts.map(renderAlsoCard).join('');
+  } else {
+    document.querySelector('.also-like').style.display = 'none';
+  }
+
+  // ─── Notification ─────────────────────────────────────────────────────────────
+  let _nt;
+  function notify(msg) {
+    const el = document.getElementById('notification');
+    el.textContent = msg; el.classList.add('show');
+    clearTimeout(_nt); _nt = setTimeout(()=>el.classList.remove('show'), 2800);
+  }
+
+  // ─── Live Sync Engine ─────────────────────────────────────────────────────────
+  let _syncLast = '';
+
+  function syncProduct() {
+    try {
+      const raw = localStorage.getItem('origami_data');
+      if (!raw || raw === _syncLast) return;
+      _syncLast = raw;
+      const d = JSON.parse(raw);
+      const updated = (d.products || []).find(p => p.id === prodId);
+      if (!updated) return;
+
+      // Update price
+      document.getElementById('prodPrice').textContent = `${(updated.price||0).toLocaleString()} DA`;
+      const origEl = document.getElementById('prodOriginal');
+      const saveEl = document.getElementById('prodSave');
+      if (updated.originalPrice) {
+        origEl.textContent = `${updated.originalPrice.toLocaleString()} DA`;
+        origEl.style.display = '';
+        saveEl.textContent = `-${Math.round((1-updated.price/updated.originalPrice)*100)}%`;
+        saveEl.style.display = '';
+      } else {
+        origEl.style.display = 'none';
+        saveEl.style.display = 'none';
+      }
+
+      // Update title & brand
+      document.getElementById('prodTitle').textContent = updated.name;
+      document.getElementById('prodBrand').textContent = updated.brand || 'ORIGAMI';
+
+      // Update description
+      if (updated.description) document.getElementById('prodDescText').textContent = updated.description;
+
+      // Show sync badge
+      let b = document.getElementById('syncBadge');
+      if (!b) {
+        b = document.createElement('div');
+        b.id = 'syncBadge';
+        b.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#0a0a0a;color:#f8f6f3;padding:.5rem 1rem;font-family:"Josefin Sans",sans-serif;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;z-index:9000;opacity:0;transition:opacity .4s;pointer-events:none;';
+        document.body.appendChild(b);
+      }
+      b.textContent = '● Produit mis à jour';
+      b.style.opacity = '1';
+      clearTimeout(b._t);
+      b._t = setTimeout(() => b.style.opacity = '0', 2500);
+    } catch(e) {}
+  }
+
+  // Listen from other tabs (storage event)
+  window.addEventListener('storage', e => {
+    if (e.key === 'origami_data') syncProduct();
+  });
+
+  // BroadcastChannel — instant push from admin
+  try {
+    const bc = new BroadcastChannel('origami_sync');
+    bc.onmessage = (e) => { if (e.data?.type === 'origami_update') syncProduct(); };
+  } catch(e) {}
+
+  // Re-sync when user switches back to this tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncProduct();
+  });
+  window.addEventListener('focus', syncProduct);
+
+  // ─── Cursor ───────────────────────────────────────────────────────────────────
+  const cur = document.getElementById('cursor');
+  const curR = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+  (function anim(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(anim);})();
+</script>
+</body>
+</html>
