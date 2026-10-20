@@ -571,6 +571,37 @@
   .trend-img-wrap { aspect-ratio: 3/4; background: var(--grey-light); overflow: hidden; position: relative; margin-bottom: 0.9rem; }
   .trend-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
   .trend-card:hover .trend-img-wrap img { transform: scale(1.04); }
+
+  /* SWIPEABLE PHOTO STRIP (trend cards) */
+  .trend-photo-scroll {
+    position:absolute; inset:0; display:flex; overflow-x:auto;
+    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; cursor:grab;
+  }
+  .trend-photo-scroll::-webkit-scrollbar { display:none; }
+  .trend-photo-scroll:active { cursor:grabbing; }
+  .trend-photo-item { flex:0 0 100%; scroll-snap-align:start; position:relative; width:100%; height:100%; }
+  .trend-photo-item img { position:absolute; inset:0; }
+  .trend-photo-dots {
+    position:absolute; top:0.6rem; left:0; right:0;
+    display:flex; justify-content:center; gap:0.3rem; z-index:2;
+    pointer-events:none;
+  }
+  .trend-photo-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.55); transition:background .2s, transform .2s; }
+  .trend-photo-dot.active { background:#fff; transform:scale(1.3); }
+  .trend-photo-arrow {
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:28px; height:28px; border-radius:50%; border:none;
+    background:rgba(255,255,255,0.75); color:#0a0a0a;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.85rem; line-height:1; cursor:pointer; z-index:3;
+    opacity:0; transition:opacity .25s ease, background .2s;
+  }
+  .trend-card:hover .trend-photo-arrow { opacity:1; }
+  .trend-photo-arrow:hover { background:#fff; }
+  .trend-photo-arrow.prev { left:0.5rem; }
+  .trend-photo-arrow.next { right:0.5rem; }
+
   .trend-cat { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey-mid); display: block; margin-bottom: 0.3rem; }
   .trend-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; display: block; margin-bottom: 0.3rem; }
   .trend-price { font-size: 0.75rem; color: var(--grey-mid); display: block; margin-bottom: 0.8rem; }
@@ -2409,11 +2440,21 @@
   let trendPage = 0;
 
   function trendCardHTML(p) {
-    const firstImg = (p.photos?.length ? p.photos[0] : null) || p.colors?.find(c=>c.image)?.image || null;
+    const allPhotos = [
+      ...(p.photos?.length ? p.photos : []),
+      ...(p.colors?.map(c => c.image).filter(Boolean) || []),
+    ].filter((src, idx, arr) => arr.indexOf(src) === idx);
     const firstHex = p.colors?.[0]?.hex || p.color || '#c8c4be';
-    const imgHTML = firstImg
-      ? `<img src="${firstImg}" alt="${p.name}">`
-      : `<div style="width:100%;height:100%;background:${firstHex}"></div>`;
+
+    const imgHTML = allPhotos.length
+      ? `<div class="trend-photo-scroll" onclick="event.stopPropagation()">
+           ${allPhotos.map(src => `<div class="trend-photo-item"><img src="${src}" alt="${p.name}"></div>`).join('')}
+         </div>
+         ${allPhotos.length > 1 ? `<div class="trend-photo-dots">${allPhotos.map((_,di) => `<span class="trend-photo-dot${di===0?' active':''}"></span>`).join('')}</div>
+         <button type="button" class="trend-photo-arrow prev" onclick="event.stopPropagation();shiftTrendPhoto(this,-1)" aria-label="Photo précédente">‹</button>
+         <button type="button" class="trend-photo-arrow next" onclick="event.stopPropagation();shiftTrendPhoto(this,1)" aria-label="Photo suivante">›</button>` : ''}`
+      : `<div style="position:absolute;inset:0;background:${firstHex}"></div>`;
+
     return `
       <div class="trend-card" onclick="location.href='product.html?id=${p.id}'">
         <div class="trend-img-wrap">${imgHTML}</div>
@@ -2422,6 +2463,44 @@
         <span class="trend-price">DA ${(p.price||0).toLocaleString()}</span>
         <button class="trend-add-btn" onclick="event.stopPropagation();addToCart(${p.id})">Ajouter au panier</button>
       </div>`;
+  }
+
+  // ─── Arrow buttons: step to prev/next photo on a trend card ──────────────────
+  function shiftTrendPhoto(btn, dir) {
+    const wrap = btn.closest('.trend-img-wrap');
+    const strip = wrap.querySelector('.trend-photo-scroll');
+    if (!strip) return;
+    const count = strip.querySelectorAll('.trend-photo-item').length;
+    const current = Math.round(strip.scrollLeft / strip.clientWidth);
+    const next = (current + dir + count) % count;
+    strip.scrollTo({ left: next * strip.clientWidth, behavior: 'smooth' });
+  }
+
+  // ─── Swipeable photo strip: scroll-synced dots + mouse-drag support ──────────
+  function initTrendPhotoSwipe() {
+    document.querySelectorAll('.trend-photo-scroll').forEach(strip => {
+      if (strip._swipeInit) return;
+      strip._swipeInit = true;
+
+      const dotsWrap = strip.parentElement.querySelector('.trend-photo-dots');
+      const syncDots = () => {
+        if (!dotsWrap) return;
+        const idx = Math.round(strip.scrollLeft / strip.clientWidth);
+        dotsWrap.querySelectorAll('.trend-photo-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+      };
+      strip.addEventListener('scroll', () => requestAnimationFrame(syncDots), { passive: true });
+
+      let isDown = false, startX = 0, startScroll = 0, moved = false;
+      strip.addEventListener('mousedown', e => { isDown = true; moved = false; startX = e.pageX; startScroll = strip.scrollLeft; });
+      window.addEventListener('mousemove', e => {
+        if (!isDown) return;
+        const dx = e.pageX - startX;
+        if (Math.abs(dx) > 4) moved = true;
+        strip.scrollLeft = startScroll - dx;
+      });
+      window.addEventListener('mouseup', () => { isDown = false; });
+      strip.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); } });
+    });
   }
 
   function renderTrending() {
@@ -2439,6 +2518,7 @@
     const start = trendPage * TREND_PAGE_SIZE;
     const pageItems = products.slice(start, start + TREND_PAGE_SIZE);
     grid.innerHTML = pageItems.map(trendCardHTML).join('');
+    initTrendPhotoSwipe();
 
     if (totalPages > 1) {
       dotsWrap.style.display = 'flex';
