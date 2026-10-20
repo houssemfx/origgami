@@ -148,6 +148,13 @@
   .product-tag.Sale { background:var(--black); color:var(--white); }
   .product-tag.sale-tag { background:var(--red); color:var(--white); }
   .product-tag.excl { background:#1a237e; color:var(--white); }
+  .product-promo {
+    position:absolute; top:1rem; right:1rem;
+    background:var(--red); color:var(--white);
+    font-size:.6rem; letter-spacing:.05em; font-weight:400;
+    padding:.35rem .55rem; z-index:2; line-height:1;
+    font-family:'Cormorant Garamond',serif;
+  }
 
   .product-quick-add {
     position:absolute; bottom:0; left:0; right:0;
@@ -375,14 +382,14 @@ function productMatchesCat(p) {
   const cs    = catStem;
 
   // Exact norm match
-  if (pCat === cn || pSub === cn) return true;
+  if (pCat === cn || (pSub && pSub === cn)) return true;
   // Stem match
-  if (pCatS === cs || pSubS === cs) return true;
-  // Containment
-  if (pCat.includes(cn) || cn.includes(pCat)) return true;
-  if (pSub.includes(cn) || cn.includes(pSub)) return true;
-  if (pCatS.includes(cs) || cs.includes(pCatS)) return true;
-  if (pSubS.includes(cs) || cs.includes(pSubS)) return true;
+  if (pCatS === cs || (pSubS && pSubS === cs)) return true;
+  // Containment (guard against empty strings, which are contained in everything)
+  if (pCat && cn && (pCat.includes(cn) || cn.includes(pCat))) return true;
+  if (pSub && cn && (pSub.includes(cn) || cn.includes(pSub))) return true;
+  if (pCatS && cs && (pCatS.includes(cs) || cs.includes(pCatS))) return true;
+  if (pSubS && cs && (pSubS.includes(cs) || cs.includes(pSubS))) return true;
 
   // Token match: every word of URL cat must appear somewhere in product cat+sub
   const cnTokens = cn.split(' ').filter(t => t.length > 2);
@@ -515,13 +522,14 @@ function renderProducts() {
       const taillesHTML = p.tailles?.length
         ? `<div class="product-tailles">${p.tailles.map(t=>`<span class="product-taille">${t}</span>`).join('')}</div>` : '';
 
-      const prodUrl = `product.html?id=${p.id}&cat=${encodeURIComponent(cat)}&name=${encodeURIComponent(p.name)}&price=${p.price||0}${p.originalPrice?'&orig='+p.originalPrice:''}${p.tag?'&tag='+encodeURIComponent(p.tag):''}`;
+      const prodUrl = `product.html?id=${p.id}&cat=${encodeURIComponent(catParam)}&name=${encodeURIComponent(p.name)}&price=${p.price||0}${p.originalPrice?'&orig='+p.originalPrice:''}${p.tag?'&tag='+encodeURIComponent(p.tag):''}`;
 
       return `
         <div class="product-card reveal" style="animation-delay:${Math.min(i*0.04,0.4)}s;cursor:pointer" onclick="location.href='${prodUrl}'">
           <div class="product-img-wrap">
             ${imgHTML}
             ${(p.qty??1)===0 ? `<span class="product-tag sale-tag">Épuisé</span>` : p.tag ? `<span class="product-tag ${tagClass}">${tagLabel}</span>` : ''}
+            ${p.promo ? `<span class="product-promo">-${p.promo}%</span>` : ''}
             <button class="product-quick-add" onclick="event.stopPropagation();location.href='${prodUrl}'">Voir le produit →</button>
           </div>
           <div class="product-info">
@@ -640,11 +648,25 @@ let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx+'px'; cursor.style.top=my+'px'; });
 (function animRing(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
 
+// Pull the shared catalogue from the server (works across every visitor/device)
+async function syncFromAPI() {
+  try {
+    const res = await fetch('/api/data', { cache: 'no-store' });
+    if (!res.ok) return;
+    const fresh = await res.json();
+    if (fresh && fresh.products) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+      renderProducts();
+    }
+  } catch(e) { /* offline or API unavailable — keep local cache */ }
+}
+
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
 setupHero();
 renderProducts();
+syncFromAPI();
 </script>
 </body>
 </html>

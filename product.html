@@ -57,6 +57,7 @@
   .product-tag-top{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .9rem;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1.2rem;}
   .product-tag-top.new{background:var(--black);color:var(--white);}
   .product-tag-top.promo{background:var(--red);color:var(--white);}
+  .main-img-promo{position:absolute;top:1.5rem;right:1.5rem;background:var(--red);color:var(--white);font-size:.7rem;letter-spacing:.05em;padding:.5rem .8rem;z-index:5;font-family:'Cormorant Garamond',serif;}
 
   .product-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3vw,2.6rem);font-weight:300;line-height:1.05;margin-bottom:.5rem;}
 
@@ -198,131 +199,6 @@
 <div class="cursor-ring" id="cursorRing"></div>
 <div class="notification" id="notification"></div>
 
-<!-- ORDER MODAL -->
-<div class="modal-overlay" id="orderModal">
-  <div class="modal" id="modalBox">
-    <div id="orderForm">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title">Commander</div>
-          <div class="modal-subtitle">Remplissez vos informations de livraison</div>
-        </div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <!-- Product summary -->
-        <div class="modal-summary">
-          <div>
-            <div class="modal-product-name" id="modalProdName">—</div>
-            <div class="modal-product-detail" id="modalProdDetail">—</div>
-          </div>
-          <div class="modal-product-price" id="modalProdPrice">—</div>
-        </div>
-
-        <div class="form-divider">Informations personnelles</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Prénom *</label>
-            <input class="form-input" id="fPrenom" type="text" placeholder="Votre prénom" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nom *</label>
-            <input class="form-input" id="fNom" type="text" placeholder="Votre nom" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Téléphone *</label>
-            <input class="form-input" id="fTel" type="tel" placeholder="06 XX XX XX XX" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">WhatsApp</label>
-            <input class="form-input" id="fWa" type="tel" placeholder="(si différent)">
-          </div>
-        </div>
-
-        <div class="form-divider">Adresse de livraison</div>
-        <div class="form-row full">
-          <div class="form-group">
-            <label class="form-label">Wilaya *</label>
-            <select class="form-select" id="fWilaya">
-              <option value="">— Choisir la wilaya —</option>
-              <option>Alger</option><option>Oran</option><option>Constantine</option>
-              <option>Annaba</option><option>Blida</option><option>Batna</option>
-              <option>Sétif</option><option>Sidi Bel Abbès</option><option>Biskra</option>
-              <option>Tébessa</option><option>Tlemcen</option><option>Béjaïa</option>
-              <option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
-              <option>Mascara</option><option>Ouargla</option><option>Tizi Ouzou</option>
-              <option>Jijel</option><option>Skikda</option><option>Guelma</option>
-              <option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option>
-              <option>Tiaret</option><option>Bejaia</option><option>Bordj Bou Arreridj</option>
-              <option>Boumerdès</option><option>El Tarf</option><option>Tissemsilt</option>
-              <option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option>
-              <option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
-              <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option>
-              <option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option>
-              <option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option>
-              <option>In Guezzam</option><option>Touggourt</option><option>Djanet</option>
-              <option>El M'Ghair</option><option>El Meniaa</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="form-group">
-            <label class="form-label">Adresse complète *</label>
-            <input class="form-input" id="fAdresse" type="text" placeholder="Rue, quartier, commune…" required>
-          </div>
-        </div>
-
-        <div class="form-divider">Détails de la commande</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Couleur</label>
-            <input class="form-input" id="fColor" type="text" readonly>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Taille</label>
-            <input class="form-input" id="fSize" type="text" readonly>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Quantité</label>
-            <input class="form-input" id="fQty" type="number" min="1" value="1">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Total estimé</label>
-            <input class="form-input" id="fTotal" type="text" readonly>
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="form-group">
-            <label class="form-label">Note (optionnel)</label>
-            <textarea class="form-textarea" id="fNote" placeholder="Précisions sur votre commande…"></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-confirm" onclick="submitOrder()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Confirmer la commande
-        </button>
-      </div>
-    </div>
-
-    <!-- SUCCESS -->
-    <div class="order-success" id="orderSuccess">
-      <div class="success-icon">✓</div>
-      <div class="success-title">Commande reçue !</div>
-      <p class="success-sub">Merci pour votre confiance.<br>Notre équipe vous contactera sous 24h pour confirmer.</p>
-      <br>
-      <button class="btn-order" onclick="closeModal()" style="display:inline-flex;width:auto;padding:1rem 2rem;margin-top:1rem;">
-        Continuer mes achats
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- HEADER -->
 <header>
   <div class="header-top">
@@ -399,7 +275,7 @@
 
     <!-- BUTTONS -->
     <div class="action-btns" style="margin-top:1.2rem;">
-      <button class="btn-order" onclick="openModal()">
+      <button class="btn-order" onclick="goToOrder()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         Commander maintenant
       </button>
@@ -507,6 +383,11 @@
   if (product.tag) {
     const tagEl = document.getElementById('prodTagWrap');
     tagEl.innerHTML = `<span class="product-tag-top ${product.tag.toLowerCase() === 'sale' ? 'promo' : 'new'}">${product.tag}</span>`;
+  }
+
+  // Promo badge (corner of main image)
+  if (product.promo) {
+    document.getElementById('mainImgWrap').insertAdjacentHTML('beforeend', `<span class="main-img-promo">-${product.promo}%</span>`);
   }
 
   // Price
@@ -626,58 +507,31 @@
     btn.classList.add('active');
   }
 
-  // ─── Add to cart notification ─────────────────────────────────────────────────
+  // ─── Add to cart ──────────────────────────────────────────────────────────────
+  const CART_KEY = 'origami_cart';
   function addedToCart() {
+    const qty = parseInt(document.getElementById('qtyNum').value) || 1;
+    try {
+      const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      const existing = cart.find(i => i.id === product.id);
+      if (existing) { existing.qty += qty; }
+      else { cart.push({ ...product, qty }); }
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      try { new BroadcastChannel('origami_sync').postMessage({ type: 'origami_cart' }); } catch(e) {}
+    } catch(e) {}
     notify(`${product.name} ajouté au panier`);
   }
 
-  // ─── Order Modal ──────────────────────────────────────────────────────────────
-  function openModal() {
+  // ─── Go to order page ────────────────────────────────────────────────────────
+  function goToOrder() {
     const qty = parseInt(document.getElementById('qtyNum').value)||1;
-    const total = (product.price * qty).toLocaleString();
-    document.getElementById('modalProdName').textContent = product.name;
-    document.getElementById('modalProdDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
-    document.getElementById('modalProdPrice').textContent = `${total} DA`;
-    document.getElementById('fColor').value = selectedColor;
-    document.getElementById('fSize').value = selectedSize;
-    document.getElementById('fQty').value = qty;
-    document.getElementById('fTotal').value = `${total} DA`;
-    document.getElementById('orderModal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    document.getElementById('orderModal').classList.remove('open');
-    document.body.style.overflow = '';
-    // Reset success state
-    setTimeout(() => {
-      document.getElementById('orderForm').style.display = '';
-      document.getElementById('orderSuccess').classList.remove('show');
-    }, 400);
-  }
-  document.getElementById('orderModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('orderModal')) closeModal();
-  });
-
-  // Update total when qty changes in form
-  document.getElementById('fQty').addEventListener('input', () => {
-    const q = parseInt(document.getElementById('fQty').value)||1;
-    document.getElementById('fTotal').value = `${(product.price * q).toLocaleString()} DA`;
-    document.getElementById('modalProdDetail').textContent = [selectedColor, selectedSize, `Qté: ${q}`].filter(Boolean).join(' · ');
-  });
-
-  function submitOrder() {
-    const prenom = document.getElementById('fPrenom').value.trim();
-    const nom = document.getElementById('fNom').value.trim();
-    const tel = document.getElementById('fTel').value.trim();
-    const wilaya = document.getElementById('fWilaya').value;
-    const adresse = document.getElementById('fAdresse').value.trim();
-    if (!prenom || !nom || !tel || !wilaya || !adresse) {
-      notify('Veuillez remplir tous les champs obligatoires (*)');
-      return;
-    }
-    // Show success
-    document.getElementById('orderForm').style.display = 'none';
-    document.getElementById('orderSuccess').classList.add('show');
+    const p = new URLSearchParams({
+      id: prodId,
+      color: selectedColor || '',
+      size: selectedSize || '',
+      qty: qty,
+    });
+    location.href = 'order.html?' + p.toString();
   }
 
   // ─── Also Like ────────────────────────────────────────────────────────────────
@@ -792,6 +646,19 @@
     if (document.visibilityState === 'visible') syncProduct();
   });
   window.addEventListener('focus', syncProduct);
+
+  // Pull the shared catalogue from the server (works across every visitor/device)
+  (async function syncFromAPI() {
+    try {
+      const res = await fetch('/api/data', { cache: 'no-store' });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      if (fresh && fresh.products) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        syncProduct();
+      }
+    } catch(e) { /* offline or API unavailable — keep local cache */ }
+  })();
 
   // ─── Cursor ───────────────────────────────────────────────────────────────────
   const cur = document.getElementById('cursor');

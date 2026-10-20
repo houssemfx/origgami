@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORIGAMI — Commander</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#0a0a0a; --white:#f8f6f3;
+    --grey-light:#e8e5e0; --grey-mid:#b0aba3; --grey-dark:#3a3835;
+    --red:#8b0000;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--white);color:var(--black);font-family:'Josefin Sans',sans-serif;font-weight:300;letter-spacing:.04em;}
+
+  /* HEADER */
+  header{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(248,246,243,.97);border-bottom:1px solid var(--grey-light);padding:0 3rem;backdrop-filter:blur(12px);}
+  .header-top{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--black);}
+  .logo-img{height:44px;mix-blend-mode:multiply;}
+  .logo-text{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.4rem;letter-spacing:.3em;}
+  .back-btn{display:flex;align-items:center;gap:.5rem;text-decoration:none;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--grey-mid);transition:color .3s;}
+  .back-btn svg{width:14px;height:14px;}
+  .back-btn:hover{color:var(--black);}
+
+  .page{max-width:1000px;margin:0 auto;padding:6rem 2rem 5rem;display:grid;grid-template-columns:1fr 1.3fr;gap:3rem;}
+
+  /* SUMMARY */
+  .summary{position:sticky;top:6rem;align-self:start;}
+  .main-img-wrap{width:100%;aspect-ratio:3/4;background:var(--grey-light);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:.8rem;}
+  .main-img{width:100%;height:100%;object-fit:cover;}
+  .thumbs-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+  .thumb{width:56px;height:70px;object-fit:cover;border:2px solid transparent;cursor:pointer;opacity:.6;transition:opacity .2s,border-color .2s;}
+  .thumb.active,.thumb:hover{opacity:1;border-color:var(--black);}
+  .summary-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:.3rem;}
+  .summary-detail{font-size:.62rem;letter-spacing:.1em;color:var(--grey-mid);margin-bottom:.8rem;}
+  .summary-price{font-family:'Cormorant Garamond',serif;font-size:1.6rem;}
+
+  /* FORM */
+  .form-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:.3rem;}
+  .form-subtitle{font-size:.62rem;letter-spacing:.1em;color:var(--grey-mid);margin-bottom:2rem;}
+  .form-divider{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grey-mid);padding:.8rem 0;border-top:1px solid var(--grey-light);border-bottom:1px solid var(--grey-light);margin:1.5rem 0 1.2rem;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+  .form-row.full{grid-template-columns:1fr;}
+  .form-group{display:flex;flex-direction:column;gap:.4rem;}
+  .form-label{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--grey-dark);}
+  .form-input,.form-select,.form-textarea{padding:.8rem 1rem;border:1px solid var(--grey-light);background:none;font-family:'Josefin Sans',sans-serif;font-size:.7rem;color:var(--black);outline:none;transition:border-color .25s;width:100%;}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--black);}
+  .form-textarea{resize:vertical;min-height:80px;}
+  .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b0aba3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
+
+  .btn-confirm{width:100%;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:background .3s;display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1rem;}
+  .btn-confirm:hover{background:#333;}
+  .btn-confirm svg{width:14px;height:14px;}
+
+  /* SUCCESS */
+  .order-success{display:none;text-align:center;padding:4rem 2rem;grid-column:1/-1;}
+  .order-success.show{display:block;}
+  .success-icon{font-size:3rem;margin-bottom:1rem;}
+  .success-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:.5rem;}
+  .success-sub{font-size:.65rem;letter-spacing:.1em;color:var(--grey-mid);}
+  .btn-order{display:inline-flex;align-items:center;gap:.6rem;padding:1rem 2rem;margin-top:1.5rem;background:var(--black);color:var(--white);border:none;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;cursor:pointer;}
+
+  .notification{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--black);color:var(--white);padding:1rem 2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;z-index:300;transition:transform .4s cubic-bezier(.76,0,.24,1);white-space:nowrap;}
+  .notification.show{transform:translateX(-50%) translateY(0);}
+
+  @media(max-width:768px){
+    header{padding:0 1.5rem;}
+    .page{grid-template-columns:1fr;padding:5rem 1.5rem 3rem;gap:2rem;}
+    .summary{position:static;}
+    .form-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="notification" id="notification"></div>
+
+<header>
+  <div class="header-top">
+    <a href="index.html" class="logo">
+      <img src="574978275_4260126607599725_2794783614384322684_n.jpg" alt="ORIGAMI" class="logo-img">
+      <span class="logo-text">ORIGAMI</span>
+    </a>
+    <a href="javascript:history.back()" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Retour
+    </a>
+  </div>
+</header>
+
+<div class="page" id="page">
+
+  <!-- SUMMARY -->
+  <div class="summary" id="summary">
+    <div class="main-img-wrap" id="mainImgWrap"></div>
+    <div class="thumbs-row" id="thumbsRow"></div>
+    <div class="summary-name" id="summaryName">—</div>
+    <div class="summary-detail" id="summaryDetail">—</div>
+    <div class="summary-price" id="summaryPrice">—</div>
+  </div>
+
+  <!-- FORM -->
+  <div id="orderForm">
+    <div class="form-title">Commander</div>
+    <div class="form-subtitle">Remplissez vos informations de livraison</div>
+
+    <div class="form-divider">Informations personnelles</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Prénom *</label>
+        <input class="form-input" id="fPrenom" type="text" placeholder="Votre prénom" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom *</label>
+        <input class="form-input" id="fNom" type="text" placeholder="Votre nom" required>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Téléphone *</label>
+        <input class="form-input" id="fTel" type="tel" placeholder="06 XX XX XX XX" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp</label>
+        <input class="form-input" id="fWa" type="tel" placeholder="(si différent)">
+      </div>
+    </div>
+
+    <div class="form-divider">Adresse de livraison</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Wilaya *</label>
+        <select class="form-select" id="fWilaya">
+          <option value="">— Choisir la wilaya —</option>
+          <option>Alger</option><option>Oran</option><option>Constantine</option>
+          <option>Annaba</option><option>Blida</option><option>Batna</option>
+          <option>Sétif</option><option>Sidi Bel Abbès</option><option>Biskra</option>
+          <option>Tébessa</option><option>Tlemcen</option><option>Béjaïa</option>
+          <option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
+          <option>Mascara</option><option>Ouargla</option><option>Tizi Ouzou</option>
+          <option>Jijel</option><option>Skikda</option><option>Guelma</option>
+          <option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option>
+          <option>Tiaret</option><option>Bejaia</option><option>Bordj Bou Arreridj</option>
+          <option>Boumerdès</option><option>El Tarf</option><option>Tissemsilt</option>
+          <option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option>
+          <option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
+          <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option>
+          <option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option>
+          <option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option>
+          <option>In Guezzam</option><option>Touggourt</option><option>Djanet</option>
+          <option>El M'Ghair</option><option>El Meniaa</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Adresse complète *</label>
+        <input class="form-input" id="fAdresse" type="text" placeholder="Rue, quartier, commune…" required>
+      </div>
+    </div>
+
+    <div class="form-divider">Détails de la commande</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Couleur</label>
+        <input class="form-input" id="fColor" type="text" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Taille</label>
+        <input class="form-input" id="fSize" type="text" readonly>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Quantité</label>
+        <input class="form-input" id="fQty" type="number" min="1" value="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total estimé</label>
+        <input class="form-input" id="fTotal" type="text" readonly>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Note (optionnel)</label>
+        <textarea class="form-textarea" id="fNote" placeholder="Précisions sur votre commande…"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-confirm" onclick="submitOrder()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Confirmer la commande
+    </button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="order-success" id="orderSuccess">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Commande reçue !</div>
+    <p class="success-sub">Merci pour votre confiance.<br>Notre équipe vous contactera sous 24h pour confirmer.</p>
+    <a href="index.html" class="btn-order">Continuer mes achats</a>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'origami_data';
+
+function loadData() {
+  try { const s = localStorage.getItem(STORAGE_KEY); if (s) return JSON.parse(s); } catch(e) {}
+  return null;
+}
+
+const params   = new URLSearchParams(location.search);
+const prodId   = parseInt(params.get('id'));
+
+let selectedColor = params.get('color') || '';
+let selectedSize  = params.get('size') || '';
+let qty           = parseInt(params.get('qty')) || 1;
+
+function notify(msg) {
+  const n = document.getElementById('notification');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+let product = null;
+
+(async function init() {
+  // Pull the shared catalogue from the server first (works across every visitor/device);
+  // fall back to the local cache if offline or the API is unavailable.
+  let data;
+  try {
+    const res = await fetch('/api/data', { cache: 'no-store' });
+    data = res.ok ? await res.json() : null;
+    if (data) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) { /* offline */ }
+  if (!data) data = loadData();
+
+  const products = data?.products || [];
+  product = products.find(p => p.id === prodId);
+
+  if (!product) {
+    document.getElementById('page').innerHTML = `
+      <div class="order-success show" style="padding:6rem 2rem;">
+        <div class="success-title">Produit introuvable</div>
+        <a href="index.html" class="btn-order">Retour à la boutique</a>
+      </div>`;
+    return;
+  }
+
+  const photos = product.photos?.length ? product.photos : (product.colors?.filter(c=>c.image).map(c=>c.image) || []);
+  const mainWrap = document.getElementById('mainImgWrap');
+  const thumbsRow = document.getElementById('thumbsRow');
+
+  function setMainImage(src) {
+    mainWrap.innerHTML = src
+      ? `<img src="${src}" class="main-img">`
+      : `<div style="width:100%;height:100%;background:${product.color||'#d4d0ca'}"></div>`;
+  }
+
+  if (photos.length > 0) {
+    setMainImage(photos[0]);
+    thumbsRow.innerHTML = photos.map((src,i) =>
+      `<img src="${src}" class="thumb${i===0?' active':''}" onclick="selectThumb(this,'${src}')">`
+    ).join('');
+  } else {
+    setMainImage(null);
+  }
+
+  window.selectThumb = function(el, src) {
+    document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    setMainImage(src);
+  };
+
+  document.getElementById('summaryName').textContent = product.name;
+  document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+  document.getElementById('summaryPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
+
+  document.getElementById('fColor').value = selectedColor;
+  document.getElementById('fSize').value = selectedSize;
+  document.getElementById('fQty').value = qty;
+  document.getElementById('fTotal').value = `${(product.price * qty).toLocaleString()} DA`;
+
+  document.getElementById('fQty').addEventListener('input', () => {
+    qty = parseInt(document.getElementById('fQty').value) || 1;
+    document.getElementById('fTotal').value = `${(product.price * qty).toLocaleString()} DA`;
+    document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+  });
+})();
+
+function submitOrder() {
+  const prenom  = document.getElementById('fPrenom').value.trim();
+  const nom     = document.getElementById('fNom').value.trim();
+  const tel     = document.getElementById('fTel').value.trim();
+  const wa      = document.getElementById('fWa').value.trim();
+  const wilaya  = document.getElementById('fWilaya').value;
+  const adresse = document.getElementById('fAdresse').value.trim();
+  const note    = document.getElementById('fNote').value.trim();
+
+  if (!prenom || !nom || !tel || !wilaya || !adresse) {
+    notify('Veuillez remplir tous les champs obligatoires (*)');
+    return;
+  }
+
+  const order = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    status: 'En attente',
+    product: { id: product.id, name: product.name, price: product.price, code: product.code || null },
+    color: selectedColor,
+    size: selectedSize,
+    qty,
+    total: product.price * qty,
+    customer: { prenom, nom, tel, whatsapp: wa || null },
+    wilaya,
+    adresse,
+    note: note || null,
+  };
+
+  try {
+    const orders = JSON.parse(localStorage.getItem('origami_orders') || '[]');
+    orders.unshift(order);
+    localStorage.setItem('origami_orders', JSON.stringify(orders));
+    try { new BroadcastChannel('origami_sync').postMessage({ type: 'origami_order' }); } catch(e) {}
+  } catch(e) {
+    console.error('Failed to save order', e);
+  }
+
+  // Send to shared storage so the order reaches the admin from any device
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+  }).catch(e => console.error('Order not synced to server', e));
+
+  document.getElementById('orderForm').style.display = 'none';
+  document.getElementById('summary').style.display = 'none';
+  document.getElementById('orderSuccess').classList.add('show');
+}
+</script>
+
+</body>
+</html>

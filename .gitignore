@@ -1,0 +1,4 @@
+.vercel
+.env*
+node_modules
+admin_legacy_backup

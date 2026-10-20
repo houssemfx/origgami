@@ -951,10 +951,34 @@
     .sidebar-link span { display: none; }
     .main { margin-left: 60px; }
     .stats-row { grid-template-columns: 1fr 1fr; }
+    .topbar { padding: 1rem 1.2rem; flex-wrap: wrap; gap: 0.6rem; }
+    .topbar-title { font-size: 1.1rem; }
+    .topbar-actions { gap: 0.6rem; flex-wrap: wrap; }
+    .content { padding: 1.2rem; }
+    .section-head { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+    .form-row { grid-template-columns: 1fr !important; }
+    .modal { width: 100vw !important; max-width: 100vw; }
   }
 </style>
 </head>
 <body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="position:fixed;inset:0;z-index:1000;background:#0a0a0a;display:flex;align-items:center;justify-content:center;font-family:'Josefin Sans',sans-serif;">
+  <form id="loginForm" style="width:100%;max-width:320px;padding:2.5rem;background:#f8f6f3;border:1px solid rgba(0,0,0,0.08);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;letter-spacing:0.3em;text-align:center;margin-bottom:2rem;color:#0a0a0a;">ORIGAMI</div>
+    <div style="margin-bottom:1rem;">
+      <label style="display:block;font-size:0.75rem;letter-spacing:0.15em;margin-bottom:0.4rem;color:#3a3835;">USERNAME</label>
+      <input type="text" id="loginUser" autocomplete="username" style="width:100%;padding:0.7rem 0.9rem;border:1px solid #e8e5e0;font-family:'Josefin Sans',sans-serif;font-size:0.85rem;letter-spacing:0.1em;outline:none;background:#fff;">
+    </div>
+    <div style="margin-bottom:1.5rem;">
+      <label style="display:block;font-size:0.75rem;letter-spacing:0.15em;margin-bottom:0.4rem;color:#3a3835;">PASSWORD</label>
+      <input type="password" id="loginPass" autocomplete="current-password" style="width:100%;padding:0.7rem 0.9rem;border:1px solid #e8e5e0;font-family:'Josefin Sans',sans-serif;font-size:0.85rem;letter-spacing:0.1em;outline:none;background:#fff;">
+    </div>
+    <div id="loginError" style="display:none;color:#8b0000;font-size:0.75rem;letter-spacing:0.05em;margin-bottom:1rem;">Invalid username or password.</div>
+    <button type="submit" style="width:100%;padding:0.8rem;background:#0a0a0a;color:#f8f6f3;border:none;font-family:'Josefin Sans',sans-serif;font-size:0.85rem;letter-spacing:0.2em;cursor:pointer;">SIGN IN</button>
+  </form>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -997,6 +1021,14 @@
               <input type="text" id="f-brand" placeholder="ex : ORIGAMI">
             </div>
           </div>
+          <div class="form-row full">
+            <div class="field">
+              <label>Description</label>
+              <textarea id="f-description" rows="4" placeholder="Décrivez le produit — matière, coupe, entretien…"
+                style="width:100%;border:1px solid var(--grey-light);padding:0.7rem 0.9rem;font-family:'Josefin Sans',sans-serif;font-size:0.75rem;outline:none;background:var(--white);color:var(--black);resize:vertical;transition:border-color 0.2s"
+                onfocus="this.style.borderColor='var(--black)'" onblur="this.style.borderColor='var(--grey-light)'"></textarea>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1009,12 +1041,18 @@
         <div class="form-zone-body">
           <div class="form-row" style="grid-template-columns:1fr 1fr">
             <div class="field">
-              <label>Prix (DA) *</label>
+              <label>Prix de vente (DA) *</label>
               <input type="number" id="f-price" min="0" step="1" placeholder="0">
             </div>
             <div class="field">
               <label>Prix original (DA) <span style="color:var(--grey-mid);font-weight:300">— si promotion</span></label>
               <input type="number" id="f-originalPrice" min="0" step="1" placeholder="Laisser vide si aucune promo">
+            </div>
+          </div>
+          <div class="form-row" style="grid-template-columns:1fr 1fr">
+            <div class="field">
+              <label>Prix d'achat (DA) <span style="color:var(--grey-mid);font-weight:300">— coût réel, pour calcul du bénéfice</span></label>
+              <input type="number" id="f-costPrice" min="0" step="1" placeholder="Laisser vide pour estimer avec la marge %">
             </div>
           </div>
           <div class="form-row" style="grid-template-columns:1fr 1fr">
@@ -1037,6 +1075,12 @@
               </select>
             </div>
           </div>
+          <div class="form-row" style="grid-template-columns:1fr 1fr">
+            <div class="field">
+              <label>Promotion (%) <span style="color:var(--grey-mid);font-weight:300">— badge affiché sur le produit</span></label>
+              <input type="number" id="f-promo" min="1" max="100" step="1" placeholder="ex : 20 (laisser vide si aucune)">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1055,6 +1099,12 @@
             <div class="field">
               <label>Sous-catégorie / Conteneur</label>
               <input type="text" id="f-subcategory" placeholder="ex : Robe, Blouse, Veste…">
+            </div>
+          </div>
+          <div class="form-row full">
+            <div class="field">
+              <label>Pages du site où afficher ce produit</label>
+              <div id="f-sections" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.4rem"></div>
             </div>
           </div>
         </div>
@@ -1188,6 +1238,7 @@
 </div>
 
 <!-- SIDEBAR -->
+<div id="appContent" style="display:none">
 <aside class="sidebar">
   <div class="sidebar-logo">
     <span class="sidebar-logo-text">ORIGAMI</span>
@@ -1229,6 +1280,10 @@
       <span class="sidebar-link-icon">◎</span>
       <span>Statistics</span>
     </button>
+    <button class="sidebar-link" onclick="showPage('orders',this)">
+      <span class="sidebar-link-icon">✉</span>
+      <span>Orders</span>
+    </button>
 
     <div class="sidebar-section">System</div>
     <button class="sidebar-link" onclick="exportData()">
@@ -1238,6 +1293,10 @@
     <button class="sidebar-link" onclick="resetToDefaults()">
       <span class="sidebar-link-icon">↺</span>
       <span>Reset Defaults</span>
+    </button>
+    <button class="sidebar-link" onclick="openPasswordModal()">
+      <span class="sidebar-link-icon">⚿</span>
+      <span>Change Password</span>
     </button>
     <a href="index.html" target="_blank" class="sidebar-link">
       <span class="sidebar-link-icon">↗</span>
@@ -1446,16 +1505,43 @@
           <div class="section-head-sub">Revenue, profit &amp; performance analysis of your catalogue</div>
         </div>
         <div style="display:flex;gap:0.5rem;align-items:center">
-          <label style="font-size:0.58rem;letter-spacing:0.1em;color:var(--grey-mid)">Margin %</label>
+          <label style="font-size:0.58rem;letter-spacing:0.1em;color:var(--grey-mid)">Fallback margin % <span title="Utilisé uniquement pour les produits sans prix d'achat renseigné">ⓘ</span></label>
           <input type="number" id="marginInput" value="60" min="1" max="99" step="1"
             style="width:70px;border:1px solid var(--grey-light);padding:0.5rem 0.7rem;font-family:'Josefin Sans',sans-serif;font-size:0.7rem;outline:none"
-            oninput="renderStatisticsPage()" title="Your estimated profit margin">
+            oninput="renderStatisticsPage()" title="Estimated margin used only for products without a Prix d'achat set">
           <button class="btn btn-dark" onclick="renderStatisticsPage()">Recalculate</button>
         </div>
       </div>
 
       <!-- KPI Row -->
       <div class="kpi-grid" id="statsKpi"></div>
+
+      <!-- Prix d'achat quick entry -->
+      <div class="chart-card" style="margin-bottom:1rem">
+        <div class="chart-card-title">
+          Prix d'achat par produit
+          <span class="chart-card-sub">Entrez le coût réel — le bénéfice se recalcule automatiquement</span>
+        </div>
+        <div class="table-wrap" style="border:none;margin-top:0.5rem">
+          <table>
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Prix de vente</th>
+                <th>Prix d'achat</th>
+                <th>Bénéfice</th>
+              </tr>
+            </thead>
+            <tbody id="costEntryTableBody"></tbody>
+            <tfoot>
+              <tr style="border-top:2px solid var(--black)">
+                <td colspan="3" style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.8rem">BÉNÉFICE TOTAL</td>
+                <td id="costEntryTotalProfit" style="color:#2d6a2d;font-weight:400"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
 
       <!-- Row 1 -->
       <div class="stats-two-col">
@@ -1540,10 +1626,106 @@
       </div>
     </div>
 
+    <!-- ── ORDERS ── -->
+    <div class="page" id="page-orders">
+      <div class="section-head">
+        <div>
+          <div class="section-head-title">Orders</div>
+          <div class="section-head-sub" id="orderCount">0 commandes</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">All Orders</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Produit</th>
+              <th>Qté</th>
+              <th>Total</th>
+              <th>Livraison</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </main>
+</div>
+
+<!-- MODAL: Change Password -->
+<div class="modal-overlay" id="passwordModalOverlay" onclick="if(event.target===this)closePasswordModal()">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <span class="modal-title">Change Password</span>
+      <button class="modal-close" onclick="closePasswordModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:1.5rem">
+      <p style="font-size:0.85rem;line-height:1.6;color:var(--grey-dark,#555)">
+        The admin username and password are now set via the
+        <code>ADMIN_USER</code> and <code>ADMIN_PASSWORD</code>
+        environment variables in the Vercel project settings, not in
+        this page. Update them there, then redeploy, to change login
+        credentials.
+      </p>
+    </div>
+  </div>
+</div>
 
 <script>
+// ═══════════════════════════════════════════════════════
+//  AUTH
+// Credentials are verified server-side (api/login.js) against
+// ADMIN_USER / ADMIN_PASSWORD env vars — nothing secret ships in
+// this file. A successful login returns ADMIN_SECRET, which is kept
+// only in sessionStorage (cleared when the tab closes).
+// ═══════════════════════════════════════════════════════
+function getAdminSecret() { return sessionStorage.getItem('origgamiAdminSecret') || ''; }
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'flex';
+}
+
+if (getAdminSecret()) {
+  showApp();
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user, pass }),
+    });
+    if (!res.ok) throw new Error();
+    const { secret } = await res.json();
+    sessionStorage.setItem('origgamiAdminSecret', secret);
+    err.style.display = 'none';
+    showApp();
+  } catch (e2) {
+    err.style.display = 'block';
+  }
+});
+
+function openPasswordModal() {
+  document.getElementById('passwordModalOverlay').classList.add('open');
+}
+function closePasswordModal() {
+  document.getElementById('passwordModalOverlay').classList.remove('open');
+}
+
 // ═══════════════════════════════════════════════════════
 //  DATA DEFAULTS
 // ═══════════════════════════════════════════════════════
@@ -1571,9 +1753,9 @@ const DEFAULTS = {
     { id:10, name:'Abayas & Ensembles',  nameFr:'Abayas & Ensembles',  nameAr:'لانجري وملابس منزلية',count:88,  suffix:'Styles', color:'#dedad4', geo:'hexagon' },
   ],
   marquee: {
-    en: ['New Arrivals 2026','Free Shipping Over DA 15000','Sustainably Crafted','Exclusive Designs'],
-    fr: ['Nouveautés 2026','Livraison Gratuite dès 15000 DA','Fabriqué Durablement','Designs Exclusifs'],
-    ar: ['وصل حديثاً 2026','شحن مجاني فوق 15000 دج','صُنع باستدامة','تصاميم حصرية'],
+    en: ['New Arrivals 2026','Free Shipping Over 2 Products','Sustainably Crafted','Exclusive Designs'],
+    fr: ['Nouveautés 2026','Livraison Gratuite dès 2 produits','Fabriqué Durablement','Designs Exclusifs'],
+    ar: ['وصل حديثاً 2026','شحن مجاني عند شراء منتجين','صُنع باستدامة','تصاميم حصرية'],
   },
   hero: {
     tag: 'Collection 2026',
@@ -1595,6 +1777,7 @@ const GEOS = ['triangle','rect','diamond','circle','hexagon'];
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
+
 function load() {
   const saved = localStorage.getItem('origami_data');
   if (saved) {
@@ -1606,25 +1789,55 @@ function load() {
 // ─── BroadcastChannel for instant cross-tab sync ─────────────────────────────
 const _bc = (() => { try { return new BroadcastChannel('origami_sync'); } catch(e) { return null; } })();
 
-function save(state) {
+async function save(state) {
   try {
     const json = JSON.stringify(state);
     localStorage.setItem('origami_data', json);
-    // Broadcast to all open site tabs instantly
+    // Broadcast to all open site tabs instantly (same device)
     if (_bc) _bc.postMessage({ type: 'origami_update', ts: Date.now() });
+    document.getElementById('saveStatus').textContent = '⏳ Synchronisation…';
+
+    // Push to shared storage so every visitor / device sees it
+    const res = await fetch('/api/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': getAdminSecret() },
+      body: json,
+    });
     const t = new Date().toLocaleTimeString();
-    document.getElementById('saveStatus').textContent = '✓ Live sur le site · ' + t;
+    if (res.ok) {
+      document.getElementById('saveStatus').textContent = '✓ Live sur le site · ' + t;
+    } else {
+      document.getElementById('saveStatus').textContent = '⚠ Sauvegardé localement seulement · ' + t;
+      toast('Non synchronisé avec le site en ligne (sauvegardé sur cet appareil)', 'error');
+    }
   } catch(e) {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
       toast('⚠ Stockage plein — réduisez la taille des images', 'error');
       document.getElementById('saveStatus').textContent = '⚠ Erreur de sauvegarde';
     } else {
-      toast('Erreur sauvegarde : ' + e.message, 'error');
+      // API unreachable (e.g. local static server) — local save still succeeded
+      document.getElementById('saveStatus').textContent = '⚠ Sauvegardé localement seulement';
     }
   }
 }
 
 let state = load();
+
+// Pull the latest shared data from the server on load (overrides local cache if present)
+async function syncStateFromAPI() {
+  try {
+    const res = await fetch('/api/data', { cache: 'no-store' });
+    if (!res.ok) return;
+    const fresh = await res.json();
+    if (fresh && fresh.products) {
+      state = fresh;
+      localStorage.setItem('origami_data', JSON.stringify(state));
+      renderPage(document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard');
+      renderDashboard();
+    }
+  } catch(e) { /* offline or API unavailable — keep local cache */ }
+}
+
 let editingProductId = null;
 let editingCategoryId = null;
 let deletePending = null;
@@ -1638,7 +1851,7 @@ function showPage(name, btn) {
   document.getElementById('page-' + name).classList.add('active');
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  const titles = { dashboard:'Dashboard', products:'Products', categories:'Categories', marquee:'Marquee Strip', hero:'Hero Text', stats:'Stats Band', statistics:'Statistics' };
+  const titles = { dashboard:'Dashboard', products:'Products', categories:'Categories', marquee:'Marquee Strip', hero:'Hero Text', stats:'Stats Band', statistics:'Statistics', orders:'Orders' };
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   renderPage(name);
 }
@@ -1651,6 +1864,93 @@ function renderPage(name) {
   if (name === 'hero') renderHeroPage();
   if (name === 'stats') renderStatsPage();
   if (name === 'statistics') renderStatisticsPage();
+  if (name === 'orders') renderOrdersPage();
+}
+
+// ═══════════════════════════════════════════════════════
+//  ORDERS
+// ═══════════════════════════════════════════════════════
+function loadOrders() {
+  try { return JSON.parse(localStorage.getItem('origami_orders') || '[]'); } catch(e) { return []; }
+}
+function saveOrdersLocal(orders) {
+  localStorage.setItem('origami_orders', JSON.stringify(orders));
+  try { _bc?.postMessage({ type: 'origami_order' }); } catch(e) {}
+}
+
+async function renderOrdersPage() {
+  const tbody = document.getElementById('ordersTableBody');
+  tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--grey-mid);padding:3rem;font-size:0.65rem;letter-spacing:0.15em">CHARGEMENT…</td></tr>`;
+
+  let orders = loadOrders();
+  try {
+    const res = await fetch('/api/orders', { headers: { 'x-admin-secret': getAdminSecret() }, cache: 'no-store' });
+    if (res.ok) { orders = await res.json(); saveOrdersLocal(orders); }
+  } catch(e) { /* offline — fall back to local cache */ }
+
+  document.getElementById('orderCount').textContent = `${orders.length} commande${orders.length!==1?'s':''}`;
+  if (!orders.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--grey-mid);padding:3rem;font-size:0.65rem;letter-spacing:0.15em">NO ORDERS YET</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = orders.map(o => {
+    const productCell = o.items?.length
+      ? o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')
+      : `${o.product?.name || '—'}${o.color?`<br><span style="font-size:0.6rem;color:var(--grey-mid)">${o.color}${o.size?' · '+o.size:''}</span>`:''}`;
+    const qtyCell = o.items?.length ? o.items.reduce((s,i)=>s+i.qty,0) : (o.qty ?? '—');
+    const deliveryLine = o.deliveryFee != null
+      ? `<br><span style="font-size:0.58rem;color:var(--grey-mid)">Livraison: ${o.deliveryFee===0?'Gratuite':'DA '+o.deliveryFee.toLocaleString()}</span>`
+      : '';
+    return `
+    <tr>
+      <td style="color:var(--grey-mid);font-size:0.65rem">${new Date(o.date).toLocaleString()}</td>
+      <td>${o.customer.prenom} ${o.customer.nom||''}<br><span style="font-size:0.6rem;color:var(--grey-mid)">${o.customer.tel}</span></td>
+      <td>${productCell}</td>
+      <td>${qtyCell}</td>
+      <td><strong>DA ${(o.total||0).toLocaleString()}</strong>${deliveryLine}</td>
+      <td>${o.wilaya}${o.adresse?`<br><span style="font-size:0.6rem;color:var(--grey-mid)">${o.adresse}</span>`:''}</td>
+      <td>
+        <select onchange="updateOrderStatus(${o.id}, this.value)" style="font-size:0.62rem;padding:0.3rem 0.5rem;border:1px solid var(--grey-light)">
+          ${['En attente','Confirmée','Expédiée','Livrée','Annulée'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-danger btn-sm" onclick="deleteOrder(${o.id})">Del</button>
+        </div>
+      </td>
+    </tr>
+  `;
+  }).join('');
+}
+
+async function updateOrderStatus(id, status) {
+  const orders = loadOrders();
+  const o = orders.find(x => x.id === id);
+  if (o) { o.status = status; saveOrdersLocal(orders); }
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': getAdminSecret() },
+      body: JSON.stringify({ id, status }),
+    });
+    toast(res.ok ? 'Statut mis à jour' : 'Non synchronisé avec le serveur', res.ok ? '' : 'error');
+  } catch(e) { toast('Non synchronisé (hors ligne)', 'error'); }
+}
+
+async function deleteOrder(id) {
+  if (!confirm('Supprimer cette commande ?')) return;
+  const orders = loadOrders().filter(o => o.id !== id);
+  saveOrdersLocal(orders);
+  renderOrdersPage();
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': getAdminSecret() },
+      body: JSON.stringify({ id }),
+    });
+    toast(res.ok ? 'Commande supprimée' : 'Non synchronisé avec le serveur', res.ok ? '' : 'error');
+  } catch(e) { toast('Non synchronisé (hors ligne)', 'error'); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1729,7 +2029,7 @@ function renderProductsTable() {
       <td style="color:var(--grey-mid)">${p.originalPrice ? 'DA '+p.originalPrice : '—'}</td>
       <td>${qtyBadge(p.qty)}</td>
       <td>${badgeHTML(p.tag)}</td>
-      <td style="max-width:120px">${tailles}</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:2px;width:140px">${tailles}</div></td>
       <td>
         <div class="row-actions">
           <button class="btn btn-outline btn-sm" onclick="openEditProduct(${p.id})">Edit</button>
@@ -1796,6 +2096,23 @@ let editingColors  = [];   // [{ name, hex, image }]
 let editingTailles = [];   // ['S','M','L',...]
 let customTailles  = [];   // extra custom tailles beyond presets
 let editingPhotos  = [];   // [base64, ...]
+let editingSections = [];  // extra site pages this product appears on
+
+const SPECIAL_SECTIONS = ['Nouveautés', 'Promotions', 'Exclusivités', 'Tendances', 'Idées cadeaux'];
+
+function buildSectionsPicker(selected) {
+  const wrap = document.getElementById('f-sections');
+  const options = [...state.categories.map(c => c.name), ...SPECIAL_SECTIONS];
+  wrap.innerHTML = options.map(name => `
+    <span class="taille-chip${editingSections.includes(name)?' active':''}" onclick="toggleSection('${name.replace(/'/g,"\\'")}')">${name}</span>
+  `).join('');
+}
+
+function toggleSection(name) {
+  const i = editingSections.indexOf(name);
+  if (i > -1) editingSections.splice(i, 1); else editingSections.push(name);
+  buildSectionsPicker();
+}
 
 // ── PHOTOS ─────────────────────────────────────────────
 function handlePhotoUpload(input) {
@@ -1977,17 +2294,22 @@ function openAddProduct() {
   editingTailles   = [];
   customTailles    = [];
   editingPhotos    = [];
+  editingSections  = [];
   document.getElementById('modalTitle').textContent = 'Ajouter un produit';
   document.getElementById('f-code').value = generateProductCode();
   document.getElementById('f-name').value = '';
+  document.getElementById('f-description').value = '';
   document.getElementById('f-brand').value = 'ORIGAMI';
   document.getElementById('f-price').value = '';
   document.getElementById('f-originalPrice').value = '';
+  document.getElementById('f-costPrice').value = '';
   document.getElementById('f-qty').value = '0';
   document.getElementById('f-tag').value = '';
+  document.getElementById('f-promo').value = '';
   document.getElementById('f-subcategory').value = '';
   document.getElementById('tailleCustomInput').value = '';
   buildCategoryOptions(state.categories[0]?.name || '');
+  buildSectionsPicker();
   buildTailleUI();
   buildNamedColorsPalette();
   renderColorsContainer();
@@ -2002,18 +2324,23 @@ function openEditProduct(id) {
   editingColors    = p.colors  ? JSON.parse(JSON.stringify(p.colors))  : [];
   editingTailles   = p.tailles ? [...p.tailles] : [];
   editingPhotos    = p.photos  ? [...p.photos]  : [];
+  editingSections  = p.sections ? [...p.sections] : [];
   customTailles    = editingTailles.filter(t => !TAILLE_PRESETS.flat().includes(t));
   document.getElementById('modalTitle').textContent = 'Modifier le produit';
   document.getElementById('f-code').value = p.code || generateProductCode();
   document.getElementById('f-name').value = p.name;
+  document.getElementById('f-description').value = p.description || '';
   document.getElementById('f-brand').value = p.brand || 'ORIGAMI';
   document.getElementById('f-price').value = p.price;
   document.getElementById('f-originalPrice').value = p.originalPrice || '';
+  document.getElementById('f-costPrice').value = p.costPrice ?? '';
   document.getElementById('f-qty').value = p.qty ?? 0;
   document.getElementById('f-tag').value = p.tag || '';
+  document.getElementById('f-promo').value = p.promo || '';
   document.getElementById('f-subcategory').value = p.subcategory || '';
   document.getElementById('tailleCustomInput').value = '';
   buildCategoryOptions(p.category);
+  buildSectionsPicker();
   buildTailleUI();
   buildNamedColorsPalette();
   renderColorsContainer();
@@ -2026,16 +2353,27 @@ function saveProduct() {
   const price = parseFloat(document.getElementById('f-price').value);
   if (!name || isNaN(price)) { toast('Nom et prix obligatoires', 'error'); return; }
 
+  const promoRaw = document.getElementById('f-promo').value.trim();
+  let promo = null;
+  if (promoRaw !== '') {
+    promo = parseInt(promoRaw);
+    if (isNaN(promo) || promo < 1 || promo > 100) { toast('La promotion doit être un nombre entre 1 et 100', 'error'); return; }
+  }
+
   const data = {
     code:          document.getElementById('f-code').value.trim() || generateProductCode(),
     name,
     brand:         document.getElementById('f-brand').value.trim() || 'ORIGAMI',
+    description:   document.getElementById('f-description').value.trim() || null,
     price,
     originalPrice: parseFloat(document.getElementById('f-originalPrice').value) || null,
+    costPrice:     parseFloat(document.getElementById('f-costPrice').value) || null,
     qty:           parseInt(document.getElementById('f-qty').value) || 0,
     tag:           document.getElementById('f-tag').value || null,
+    promo,
     category:      document.getElementById('f-category').value,
     subcategory:   document.getElementById('f-subcategory').value.trim() || null,
+    sections:      [...editingSections],
     photos:        [...editingPhotos],
     tailles:       [...editingTailles],
     colors:        editingColors.map(c => ({ name: c.name, hex: c.hex, image: c.image || null })),
@@ -2310,20 +2648,69 @@ function saveStats() {
 // ═══════════════════════════════════════════════════════
 //  STATISTICS
 // ═══════════════════════════════════════════════════════
-function renderStatisticsPage() {
+function getCost(p, margin) { return p.costPrice != null ? p.costPrice : p.price * (1 - margin); }
+function getProfit(p, margin) { return p.price - getCost(p, margin); }
+
+function renderCostEntryTable() {
+  const margin = Math.min(99, Math.max(1, parseFloat(document.getElementById('marginInput')?.value) || 60)) / 100;
+  const prods = state.products;
+  const tbody = document.getElementById('costEntryTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = prods.map(p => {
+    const profit = getProfit(p, margin);
+    return `
+      <tr>
+        <td style="font-family:'Cormorant Garamond',serif;font-size:0.9rem">${p.name}</td>
+        <td><strong>DA ${fmt(p.price)}</strong></td>
+        <td>
+          <input type="number" min="0" step="1" value="${p.costPrice ?? ''}"
+            placeholder="—" data-id="${p.id}"
+            style="width:100px;border:1px solid var(--grey-light);padding:0.4rem 0.6rem;font-family:'Josefin Sans',sans-serif;font-size:0.7rem;outline:none"
+            oninput="updateCostPrice(${p.id}, this.value)">
+        </td>
+        <td id="costEntryProfit-${p.id}" style="color:#2d6a2d;font-weight:400">+DA ${fmt(profit)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('costEntryTotalProfit').textContent =
+    `+DA ${fmt(prods.reduce((s,p) => s + getProfit(p, margin), 0))}`;
+}
+
+function updateCostPrice(id, value) {
+  const p = state.products.find(x => x.id === id);
+  if (!p) return;
+  const v = parseFloat(value);
+  p.costPrice = (value === '' || isNaN(v)) ? null : v;
+  save(state);
+
+  const margin = Math.min(99, Math.max(1, parseFloat(document.getElementById('marginInput')?.value) || 60)) / 100;
+  document.getElementById('costEntryProfit-' + id).textContent = `+DA ${fmt(getProfit(p, margin))}`;
+  document.getElementById('costEntryTotalProfit').textContent =
+    `+DA ${fmt(state.products.reduce((s,pp) => s + getProfit(pp, margin), 0))}`;
+
+  renderStatisticsPage(true);
+}
+
+function renderStatisticsPage(skipCostTable) {
   const margin = Math.min(99, Math.max(1, parseFloat(document.getElementById('marginInput')?.value) || 60)) / 100;
   const prods = state.products;
   if (!prods.length) return;
 
+  if (!skipCostTable) renderCostEntryTable();
+
+  const withCostCount = prods.filter(p => p.costPrice != null).length;
+
   // ── Core numbers ──
   const totalRevenue   = prods.reduce((s, p) => s + p.price, 0);
-  const totalProfit    = prods.reduce((s, p) => s + p.price * margin, 0);
+  const totalProfit    = prods.reduce((s, p) => s + getProfit(p, margin), 0);
   const totalCost      = totalRevenue - totalProfit;
   const avgPrice       = totalRevenue / prods.length;
   const saleProds      = prods.filter(p => p.originalPrice && p.tag === 'Sale');
   const totalDiscount  = saleProds.reduce((s, p) => s + (p.originalPrice - p.price), 0);
   const totalOriginal  = saleProds.reduce((s, p) => s + p.originalPrice, 0);
-  const avgMarginPct   = (margin * 100).toFixed(0);
+  const avgMarginPct   = totalRevenue ? ((totalProfit / totalRevenue) * 100).toFixed(0) : (margin * 100).toFixed(0);
 
   // ── KPI Cards ──
   document.getElementById('statsKpi').innerHTML = `
@@ -2333,9 +2720,9 @@ function renderStatisticsPage() {
       <div class="kpi-sub">${prods.length} products · avg DA ${fmt(avgPrice)}</div>
     </div>
     <div class="kpi-card profit">
-      <div class="kpi-label">Estimated Gross Profit</div>
+      <div class="kpi-label">${withCostCount === prods.length ? 'Gross Profit' : 'Gross Profit (mixed)'}</div>
       <div class="kpi-value">DA ${fmt(totalProfit)}</div>
-      <div class="kpi-sub">At ${avgMarginPct}% margin · cost DA ${fmt(totalCost)}</div>
+      <div class="kpi-sub">Blended margin ${avgMarginPct}% · cost DA ${fmt(totalCost)}</div>
     </div>
     <div class="kpi-card discount">
       <div class="kpi-label">Total Discount Given</div>
@@ -2344,16 +2731,17 @@ function renderStatisticsPage() {
     </div>
     <div class="kpi-card avg">
       <div class="kpi-label">Profit per Product</div>
-      <div class="kpi-value">DA ${fmt(avgPrice * margin)}</div>
-      <div class="kpi-sub">Margin set at ${avgMarginPct}% — adjust above ↑</div>
+      <div class="kpi-value">DA ${fmt(totalProfit / prods.length)}</div>
+      <div class="kpi-sub">${withCostCount}/${prods.length} products have a purchase price set</div>
     </div>
   `;
 
   // ── Revenue & Profit by Category ──
   const cats = {};
   prods.forEach(p => {
-    if (!cats[p.category]) cats[p.category] = { rev: 0, count: 0 };
+    if (!cats[p.category]) cats[p.category] = { rev: 0, profit: 0, count: 0 };
     cats[p.category].rev += p.price;
+    cats[p.category].profit += getProfit(p, margin);
     cats[p.category].count++;
   });
   const catEntries = Object.entries(cats).sort((a, b) => b[1].rev - a[1].rev);
@@ -2367,12 +2755,12 @@ function renderStatisticsPage() {
     </div>
   `).join('');
 
-  const maxProf = catEntries[0]?.[1].rev * margin || 1;
+  const maxProf = Math.max(...catEntries.map(([,d]) => d.profit), 1);
   document.getElementById('profByCat').innerHTML = catEntries.map(([cat, d]) => `
     <div class="bar-row">
       <span class="bar-label">${cat}</span>
-      <div class="bar-track"><div class="bar-fill blue" style="width:${(d.rev*margin/maxProf*100).toFixed(1)}%"></div></div>
-      <span class="bar-val">DA ${fmt(d.rev * margin)}</span>
+      <div class="bar-track"><div class="bar-fill blue" style="width:${(d.profit/maxProf*100).toFixed(1)}%"></div></div>
+      <span class="bar-val">DA ${fmt(d.profit)}</span>
     </div>
   `).join('');
 
@@ -2393,20 +2781,21 @@ function renderStatisticsPage() {
       <div class="bar-track">
         <div class="bar-fill" style="width:${(p.price/maxTop*100).toFixed(1)}%;background:var(--black);opacity:0.8"></div>
       </div>
-      <span class="bar-val" style="font-size:0.78rem">DA ${fmt(p.price)} <span style="color:var(--grey-mid);font-size:0.65rem">/ DA ${fmt(p.price*margin)} profit</span></span>
+      <span class="bar-val" style="font-size:0.78rem">DA ${fmt(p.price)} <span style="color:var(--grey-mid);font-size:0.65rem">/ DA ${fmt(getProfit(p, margin))} profit</span></span>
     </div>
   `).join('');
 
   // ── Full P&L Table ──
-  document.getElementById('plTableSub').textContent = `${prods.length} products · margin ${avgMarginPct}%`;
+  document.getElementById('plTableSub').textContent = `${prods.length} products · ${withCostCount} with real cost price · blended margin ${avgMarginPct}%`;
   const sorted = [...prods].sort((a,b) => b.price - a.price);
   document.getElementById('plTableBody').innerHTML = sorted.map(p => {
-    const cost = p.price * (1 - margin);
-    const profit = p.price * margin;
+    const cost = getCost(p, margin);
+    const profit = getProfit(p, margin);
     const disc = p.originalPrice ? p.originalPrice - p.price : 0;
     const discPct = p.originalPrice ? ((disc / p.originalPrice) * 100).toFixed(0) : '—';
-    const marginPct = (margin * 100).toFixed(0);
-    const marginClass = margin >= 0.6 ? 'margin-high' : margin >= 0.4 ? 'margin-mid' : 'margin-low';
+    const marginPct = p.price ? ((profit / p.price) * 100).toFixed(0) : '0';
+    const marginClass = marginPct >= 60 ? 'margin-high' : marginPct >= 40 ? 'margin-mid' : 'margin-low';
+    const costLabel = p.costPrice != null ? `DA ${fmt(cost)}` : `<span title="Estimé à ${(margin*100).toFixed(0)}% de marge — aucun prix d'achat renseigné">≈ DA ${fmt(cost)}</span>`;
     return `
       <tr>
         <td style="font-family:'Cormorant Garamond',serif;font-size:0.9rem">${p.name}</td>
@@ -2415,7 +2804,7 @@ function renderStatisticsPage() {
         <td><strong>DA ${fmt(p.price)}</strong></td>
         <td style="color:var(--grey-mid)">${p.originalPrice ? 'DA '+fmt(p.originalPrice) : '—'}</td>
         <td>${disc ? `<span style="color:#8b0000">-DA ${fmt(disc)} (${discPct}%)</span>` : '—'}</td>
-        <td style="color:var(--grey-mid)">DA ${fmt(cost)}</td>
+        <td style="color:var(--grey-mid)">${costLabel}</td>
         <td style="color:#2d6a2d;font-weight:400">+DA ${fmt(profit)}</td>
         <td><span class="margin-pill ${marginClass}">${marginPct}%</span></td>
       </tr>
@@ -2423,7 +2812,7 @@ function renderStatisticsPage() {
   }).join('');
 
   // Totals footer
-  const totalCostAll = totalRevenue * (1 - margin);
+  const totalCostAll = totalCost;
   document.getElementById('plTableFoot').innerHTML = `
     <tr style="border-top:2px solid var(--black)">
       <td colspan="3" style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.8rem">TOTALS</td>
@@ -2572,6 +2961,7 @@ function toast(msg, type='') {
 //  INIT
 // ═══════════════════════════════════════════════════════
 renderDashboard();
+syncStateFromAPI();
 </script>
 </body>
 </html>

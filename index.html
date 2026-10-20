@@ -148,7 +148,7 @@
     transform-origin: left;
   }
 
-  .cart-btn { position: relative; }
+  .cart-btn { position: relative; display: flex; align-items: center; }
   .cart-count {
     position: absolute;
     top: -8px; right: -10px;
@@ -541,6 +541,25 @@
   }
   .section-title em { font-style: italic; }
 
+  /* RUBAN DE TIRAGE (random product carousel) */
+  .ribbon-section { padding: 6rem 0 6rem 3rem; overflow: hidden; }
+  .ribbon-section .section-label { padding-right: 3rem; }
+  .ribbon-section .section-title { padding-right: 3rem; margin-bottom: 2.5rem; }
+  .ribbon-wrap { overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent); mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent); }
+  .ribbon-track { display: flex; gap: 1.25rem; width: max-content; animation: ribbonScroll 38s linear infinite; }
+  .ribbon-track:hover { animation-play-state: paused; }
+  @keyframes ribbonScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .ribbon-card { width: 220px; flex-shrink: 0; cursor: none; text-decoration: none; color: var(--black); }
+  .ribbon-img-wrap { aspect-ratio: 3/4; background: var(--grey-light); overflow: hidden; position: relative; margin-bottom: 0.8rem; }
+  .ribbon-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .ribbon-cat { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey-mid); display: block; margin-bottom: 0.3rem; }
+  .ribbon-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; display: block; margin-bottom: 0.2rem; }
+  .ribbon-price { font-size: 0.75rem; color: var(--grey-mid); }
+  @media(max-width: 768px) {
+    .ribbon-section { padding: 4rem 0 4rem 1.5rem; }
+    .ribbon-card { width: 160px; }
+  }
+
   /* CATEGORIES GRID */
   .categories-section { padding: 6rem 3rem; }
 
@@ -694,6 +713,14 @@
     z-index: 2;
   }
   .product-tag.sale { background: #8b0000; color: white; }
+  .product-promo {
+    position: absolute;
+    bottom: 1rem; left: 1rem;
+    background: #8b0000; color: white;
+    font-size: 0.6rem; letter-spacing: 0.05em; font-weight: 400;
+    padding: 0.35rem 0.55rem; z-index: 2; line-height: 1;
+    font-family: 'Cormorant Garamond', serif;
+  }
 
   .product-wishlist {
     position: absolute;
@@ -1212,6 +1239,24 @@
   }
   .cart-drawer.open { transform: translateX(0); }
 
+  .cart-drawer.left-drawer { left: 0; right: auto; transform: translateX(-100%); border-left: none; border-right: 1px solid var(--grey-light); }
+  .cart-drawer.left-drawer.open { transform: translateX(0); }
+
+  .site-menu-btn {
+    background: none; border: none; cursor: none; color: var(--black);
+    display: flex; align-items: center; padding: 0.3rem;
+  }
+  .site-menu-list { padding: 1rem 0; overflow-y: auto; }
+  .site-menu-section {
+    font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-mid);
+    padding: 1rem 2rem 0.5rem;
+  }
+  .site-menu-list a {
+    display: block; padding: 0.7rem 2rem; text-decoration: none; color: var(--black);
+    font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; transition: background 0.2s;
+  }
+  .site-menu-list a:hover { background: var(--grey-light); }
+
   .cart-header {
     padding: 2rem;
     border-bottom: 1px solid var(--grey-light);
@@ -1376,6 +1421,46 @@
   }
   .continue-btn:hover { border-color: var(--black); color: var(--black); }
 
+  /* CHECKOUT MODAL */
+  .checkout-overlay {
+    position: fixed; inset: 0; background: rgba(10,10,10,0.6); z-index: 1100;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px);
+  }
+  .checkout-overlay.open { opacity: 1; pointer-events: all; }
+  .checkout-modal { background: var(--white); width: min(460px, 92vw); max-height: 88vh; overflow-y: auto; }
+  .checkout-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 2rem; border-bottom: 1px solid var(--grey-light);
+    font-family: 'Cormorant Garamond', serif; font-size: 1.4rem;
+  }
+  .checkout-modal-body { padding: 1.5rem 2rem 2rem; }
+  .checkout-summary { margin-bottom: 1.2rem; }
+  .checkout-summary-item {
+    display: flex; justify-content: space-between; gap: 1rem;
+    font-size: 0.72rem; color: var(--grey-dark); padding: 0.5rem 0;
+    border-bottom: 1px solid var(--grey-light);
+  }
+  .checkout-summary-item span:first-child { min-width: 0; overflow-wrap: break-word; }
+  .checkout-summary-item span:last-child { flex-shrink: 0; }
+  .checkout-field { margin-bottom: 1rem; }
+  .checkout-field label {
+    display: block; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--grey-dark); margin-bottom: 0.4rem;
+  }
+  .checkout-field input, .checkout-field select {
+    width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--grey-light); background: none;
+    font-family: 'Josefin Sans', sans-serif; font-size: 0.75rem; color: var(--black); outline: none;
+  }
+  .checkout-field input:focus, .checkout-field select:focus { border-color: var(--black); }
+  .checkout-totals { border-top: 1px solid var(--grey-light); padding-top: 1rem; margin: 1.2rem 0; }
+  .checkout-total-row { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--grey-mid); padding: 0.3rem 0; }
+  .checkout-total-final { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--black); padding-top: 0.6rem; }
+  .checkout-success { text-align: center; padding: 3.5rem 2rem; }
+  .checkout-success .success-icon { font-size: 2.8rem; }
+  .checkout-success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin: 1rem 0 0.5rem; }
+  .checkout-success-sub { font-size: 0.68rem; letter-spacing: 0.05em; color: var(--grey-mid); line-height: 1.6; }
+
   /* NOTIFICATION */
   .notification {
     position: fixed;
@@ -1488,32 +1573,32 @@
 
   /* RESPONSIVE */
   @media (max-width: 1024px) {
-    .products-grid { grid-template-columns: repeat(3, 1fr); }
-    .categories-grid { grid-template-columns: repeat(2, 1fr); }
-    .cat-card:first-child { grid-column: span 2; }
     .footer-top { grid-template-columns: 1fr 1fr; }
-    .stats-band { grid-template-columns: repeat(2, 1fr); }
-    .stat-item:nth-child(2) { border-right: none; }
-    .stat-item:nth-child(3) { border-right: 1px solid var(--grey-light); }
   }
 
   @media (max-width: 768px) {
-    header { padding: 0 1.5rem; }
-    .hero { grid-template-columns: 1fr; min-height: auto; }
-    .hero-right { height: 55vw; min-height: 300px; }
+    header { padding: 0 1rem; }
+    .header-top { height: 60px; }
+    .header-actions { gap: 0.9rem; }
+    .logo-img { height: 38px; }
+    .logo-text { font-size: 1.15rem; letter-spacing: 0.2em; }
+    .site-menu-btn svg, .cart-btn svg { width: 20px; height: 20px; }
+    .search-box.open { width: min(200px, 55vw); }
+    .hero-scroll-track { height: 300vh; }
+    .hero-sticky { height: 100svh; }
+    .hero-content, .hero-slide-content { padding: 2rem 1.25rem 2.5rem; }
+    .hero-tag { margin-bottom: 0.8rem; }
+    .hero-phrase-wrap { min-height: 6.5rem; margin-bottom: 1.2rem; }
+    .hero-phrase { font-size: clamp(2.2rem, 11vw, 4rem); }
+    .hero-brand-text { font-size: 0.85rem; margin-bottom: 1.2rem; }
+    .hero-bottom-row { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+    .hero-counter { align-self: flex-start; }
     section { padding: 4rem 1.5rem; }
-    .categories-section, .lookbook-section { padding: 4rem 1.5rem; }
-    .products-grid { grid-template-columns: repeat(2, 1fr); }
 
     .editorial-band { grid-template-columns: 1fr; }
     .editorial-right { min-height: 300px; }
     .footer-top { grid-template-columns: 1fr; gap: 2rem; }
     .footer-bottom { flex-direction: column; gap: 1rem; text-align: center; }
-    .lookbook-grid { grid-template-columns: 1fr 1fr; }
-    .look-item:nth-child(1) { grid-column: span 2; }
-    .look-item:nth-child(4) { grid-column: span 2; }
-    .hero-title { font-size: 4rem; }
-    .stats-band { grid-template-columns: repeat(2, 1fr); }
     .nl-form { flex-direction: column; }
     .nl-input { border-right: 1px solid var(--grey-dark); border-bottom: none; }
     body { cursor: auto; }
@@ -1526,6 +1611,18 @@
 <!-- Custom Cursor -->
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Site Menu Overlay -->
+<div class="cart-overlay" id="siteMenuOverlay" onclick="closeSiteMenu()"></div>
+
+<!-- Site Menu Drawer (all pages) -->
+<div class="cart-drawer left-drawer" id="siteMenuDrawer">
+  <div class="cart-header">
+    <span class="cart-title">Toutes les pages</span>
+    <button class="cart-close" onclick="closeSiteMenu()">✕</button>
+  </div>
+  <div class="site-menu-list" id="siteMenuList"></div>
+</div>
 
 <!-- Cart Overlay -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
@@ -1546,10 +1643,67 @@
   <div class="cart-footer" id="cartFooter" style="display:none">
     <div class="cart-subtotal">
       <span class="cart-subtotal-label">Subtotal</span>
-      <span class="cart-subtotal-amount" id="cartTotal">$0</span>
+      <span class="cart-subtotal-amount" id="cartTotal">DA 0</span>
     </div>
-    <button class="checkout-btn">Proceed to Checkout</button>
+    <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
     <button class="continue-btn" onclick="closeCart()">Continue Shopping</button>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="checkout-overlay" id="checkoutOverlay" onclick="if(event.target===this)closeCheckout()">
+  <div class="checkout-modal">
+    <div class="checkout-modal-header">
+      <span>Commander</span>
+      <button class="cart-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="checkout-modal-body" id="checkoutBody">
+      <div id="checkoutSummary" class="checkout-summary"></div>
+
+      <div class="checkout-field">
+        <label>Nom complet *</label>
+        <input type="text" id="chkName" placeholder="Votre nom">
+      </div>
+      <div class="checkout-field">
+        <label>Numéro de téléphone *</label>
+        <input type="tel" id="chkPhone" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="checkout-field">
+        <label>Ville *</label>
+        <select id="chkCity">
+          <option value="">— Choisir la ville —</option>
+          <option>Alger</option><option>Oran</option><option>Constantine</option>
+          <option>Annaba</option><option>Blida</option><option>Batna</option>
+          <option>Sétif</option><option>Sidi Bel Abbès</option><option>Biskra</option>
+          <option>Tébessa</option><option>Tlemcen</option><option>Béjaïa</option>
+          <option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
+          <option>Mascara</option><option>Ouargla</option><option>Tizi Ouzou</option>
+          <option>Jijel</option><option>Skikda</option><option>Guelma</option>
+          <option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option>
+          <option>Tiaret</option><option>Bordj Bou Arreridj</option>
+          <option>Boumerdès</option><option>El Tarf</option><option>Tissemsilt</option>
+          <option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option>
+          <option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
+          <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option>
+          <option>Relizane</option><option>Autre</option>
+        </select>
+      </div>
+
+      <div class="checkout-totals">
+        <div class="checkout-total-row"><span>Sous-total</span><span id="chkSubtotal">DA 0</span></div>
+        <div class="checkout-total-row"><span>Livraison</span><span id="chkDelivery">DA 0</span></div>
+        <div class="checkout-total-row checkout-total-final"><span>Total</span><span id="chkTotal">DA 0</span></div>
+      </div>
+
+      <div id="chkError" style="display:none;color:#8b0000;font-size:0.75rem;margin-bottom:0.8rem;"></div>
+      <button class="checkout-btn" onclick="submitCheckout()">Confirmer la commande</button>
+    </div>
+    <div class="checkout-success" id="checkoutSuccess" style="display:none">
+      <div class="success-icon">✓</div>
+      <div class="checkout-success-title">Commande reçue !</div>
+      <p class="checkout-success-sub">Merci pour votre confiance.<br>Notre équipe vous contactera sous 24h pour confirmer.</p>
+      <button class="checkout-btn" onclick="closeCheckout()" style="margin-top:1.5rem">Continuer mes achats</button>
+    </div>
   </div>
 </div>
 
@@ -1559,10 +1713,17 @@
 <!-- HEADER -->
 <header id="header">
   <div class="header-top">
-    <a href="#" class="logo">
-      <img src="574978275_4260126607599725_2794783614384322684_n.jpg" alt="ORIGAMI bird logo" class="logo-img">
-      <span class="logo-text">ORIGAMI</span>
-    </a>
+    <div style="display:flex;align-items:center;gap:0.9rem">
+      <button class="site-menu-btn" id="siteMenuToggle" onclick="openSiteMenu()" aria-label="Toutes les pages">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <a href="#" class="logo">
+        <img src="574978275_4260126607599725_2794783614384322684_n.jpg" alt="ORIGAMI bird logo" class="logo-img">
+        <span class="logo-text">ORIGAMI</span>
+      </a>
+    </div>
     <div class="header-actions">
       <div class="search-wrap">
         <button class="search-toggle" id="searchToggle" onclick="toggleSearch()" aria-label="Search">
@@ -1582,6 +1743,13 @@
         <span class="lang-sep">|</span>
         <button class="lang-btn" data-lang="ar" onclick="switchLang('ar')">AR</button>
       </div>
+      <button class="cart-btn" id="cartToggle" onclick="openCart()" aria-label="Panier">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
     </div>
   </div>
   <nav>
@@ -1659,7 +1827,6 @@
       <div class="hero-bottom-row">
         <div class="hero-cta">
           <a href="category.html?cat=Nouveautés" class="btn-primary">Shop New</a>
-          <a href="category.html?cat=Vêtements" class="btn-secondary">Voir la Collection</a>
         </div>
         <div class="hero-counter">
           <div class="hero-scroll-line"></div>
@@ -1683,66 +1850,27 @@
 <div class="marquee-section">
   <div class="marquee-track" id="marqueeTrack">
     <div class="marquee-item">New Arrivals 2026</div>
-    <div class="marquee-item">Free Shipping Over DA 15000</div>
+    <div class="marquee-item">Free Shipping Over 2 Products</div>
     <div class="marquee-item">Sustainably Crafted</div>
     <div class="marquee-item">Exclusive Designs</div>
     <div class="marquee-item">New Arrivals 2026</div>
-    <div class="marquee-item">Free Shipping Over DA 15000</div>
+    <div class="marquee-item">Free Shipping Over 2 Products</div>
     <div class="marquee-item">Sustainably Crafted</div>
     <div class="marquee-item">Exclusive Designs</div>
     <div class="marquee-item">New Arrivals 2026</div>
-    <div class="marquee-item">Free Shipping Over DA 15000</div>
+    <div class="marquee-item">Free Shipping Over 2 Products</div>
     <div class="marquee-item">Sustainably Crafted</div>
     <div class="marquee-item">Exclusive Designs</div>
   </div>
 </div>
 
-<!-- CATEGORIES -->
-<section class="categories-section">
-  <div class="categories-header">
-    <div>
-      <div class="section-label">Shop by Category</div>
-      <h2 class="section-title">Curated<br><em>Collections</em></h2>
-    </div>
-    <a href="#" class="view-all">View All Categories</a>
+<!-- RUBAN DE TIRAGE (random product carousel) -->
+<section class="ribbon-section">
+  <div class="section-label">Aperçu de la Boutique</div>
+  <h2 class="section-title">Un Peu de <em>Tout</em></h2>
+  <div class="ribbon-wrap">
+    <div class="ribbon-track" id="ribbonTrack"></div>
   </div>
-
-  <div class="categories-grid" id="categoriesGrid">
-    <!-- Rendered by JS from admin data -->
-  </div>
-</section>
-
-<!-- STATS -->
-<div class="stats-band">
-  <div class="stat-item reveal">
-    <span class="stat-number">1.2k<sup style="font-size:1.5rem">+</sup></span>
-    <span class="stat-label">Curated Styles</span>
-  </div>
-  <div class="stat-item reveal reveal-delay-1">
-    <span class="stat-number">48</span>
-    <span class="stat-label">New Pieces Weekly</span>
-  </div>
-  <div class="stat-item reveal reveal-delay-2">
-    <span class="stat-number">12</span>
-    <span class="stat-label">Global Designers</span>
-  </div>
-  <div class="stat-item reveal reveal-delay-3">
-    <span class="stat-number">100<sup style="font-size:1.5rem">%</sup></span>
-    <span class="stat-label">Ethically Sourced</span>
-  </div>
-</div>
-
-<!-- FEATURED PRODUCTS -->
-<section class="products-section" id="featuredSection">
-  <div class="section-label">Pièces Phares</div>
-  <h2 class="section-title" style="margin-bottom:1.5rem">Nouveaux <em>Arrivages</em></h2>
-  <div style="display:flex;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
-    <button class="prod-filter-btn active" onclick="setHomeFilter('all',this)">Tout</button>
-    <button class="prod-filter-btn" onclick="setHomeFilter('New',this)">Nouveautés</button>
-    <button class="prod-filter-btn" onclick="setHomeFilter('Sale',this)" style="color:#c62828">Promotions</button>
-    <a href="category.html?cat=Nouveaut%C3%A9s" class="prod-filter-btn" style="text-decoration:none;margin-left:auto">Voir tout →</a>
-  </div>
-  <div class="products-grid" id="productsGrid"></div>
 </section>
 
 <!-- PROMOTIONS STRIP (only visible when sale products exist) -->
@@ -1972,7 +2100,7 @@
       { id:9,  name:'Loungewear & Pyjamas',  nameFr:'Loungewear & Pyjamas',  nameAr:'ملابس سباحة',          count:44,  suffix:'Styles', color:'#e4e0da', geo:'diamond' },
       { id:10, name:'Abayas & Ensembles',    nameFr:'Abayas & Ensembles',    nameAr:'لانجري وملابس منزلية', count:88, suffix:'Styles', color:'#dedad4', geo:'hexagon' },
     ],
-    marquee: { en:['New Arrivals 2026','Free Shipping Over DA 15000','Sustainably Crafted','Exclusive Designs'] },
+    marquee: { en:['New Arrivals 2026','Free Shipping Over 2 Products','Sustainably Crafted','Exclusive Designs'] },
     hero: { tag:'Collection 2026', btnPrimary:'Shop New Arrivals', btnSecondary:'Explore Lookbook', phrases:['Nouveautés','Tendances','Nouveaux arrivages','Idées cadeaux','Exclusivités'] },
     stats: [
       { number:'1.2k+', label:'Curated Styles' },
@@ -2053,6 +2181,7 @@
       products = data.products;
       renderProducts();
       updatePromoStrip();
+      renderRibbon();
     }
 
     // Categories
@@ -2075,9 +2204,6 @@
           wrap.innerHTML = h.phrases.map((ph, i) =>
             `<div class="hero-phrase${i===0?' active':''}" id="phrase${i}"><em>${ph}</em></div>`
           ).join('');
-          heroPhrasesIds.length = 0;
-          h.phrases.forEach((_, i) => heroPhrasesIds.push('phrase' + i));
-          lastPhraseIndex = 0;
         }
       }
     }
@@ -2085,8 +2211,14 @@
     // Marquee
     if (data.marquee) {
       const lang = document.documentElement.lang || 'en';
-      const items = data.marquee[lang] || data.marquee.en || [];
+      let items = data.marquee[lang] || data.marquee.en || [];
       if (items.length) {
+        // Self-heal stale "free shipping over Xda" phrasing left over in old saved data
+        items = items.map(t => /free\s*shipping|livraison\s*gratuite|شحن\s*مجاني/i.test(t)
+          ? (lang === 'ar' ? 'شحن مجاني عند شراء منتجين'
+             : lang === 'fr' ? 'Livraison Gratuite dès 2 produits'
+             : 'Free Shipping Over 2 Products')
+          : t);
         const track = document.getElementById('marqueeTrack');
         if (track) {
           const repeated = [...items,...items,...items];
@@ -2148,7 +2280,10 @@
   // BroadcastChannel (instant, same browser, any tab)
   try {
     const bc = new BroadcastChannel('origami_sync');
-    bc.onmessage = (e) => { if (e.data?.type === 'origami_update') syncFromStorage(); };
+    bc.onmessage = (e) => {
+      if (e.data?.type === 'origami_update') syncFromStorage();
+      if (e.data?.type === 'origami_cart') { cart.length = 0; cart.push(...loadCart()); updateCartUI(); }
+    };
   } catch(e) {}
 
   // Refresh when user switches back to this tab
@@ -2158,7 +2293,14 @@
   window.addEventListener('focus', syncFromStorage);
 
   // ─── State ────────────────────────────────────────────
-  const cart = [];
+  const CART_KEY = 'origami_cart';
+  function loadCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch(e) { return []; }
+  }
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e) {}
+  }
+  const cart = loadCart();
   const wishlist = new Set();
   let homeFilter = 'all';
 
@@ -2180,6 +2322,64 @@
     } else {
       strip.style.display = 'none';
     }
+  }
+
+  // ─── Ruban de tirage (random product carousel) ─────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Picks one random product per category first (round-robin), so the ribbon
+  // reads as an overview of every "sous page" rather than one lucky category.
+  function pickAcrossCategories(prods, maxCount) {
+    const byCat = {};
+    prods.forEach(p => { const k = p.category || 'Autre'; (byCat[k] = byCat[k] || []).push(p); });
+    Object.keys(byCat).forEach(k => { byCat[k] = shuffle(byCat[k]); });
+    const cats = Object.keys(byCat);
+    const result = [];
+    let round = 0;
+    while (result.length < maxCount) {
+      let addedAny = false;
+      for (const c of cats) {
+        if (byCat[c][round]) { result.push(byCat[c][round]); addedAny = true; if (result.length >= maxCount) break; }
+      }
+      if (!addedAny) break;
+      round++;
+    }
+    return shuffle(result);
+  }
+
+  function renderRibbon() {
+    const track = document.getElementById('ribbonTrack');
+    if (!track) return;
+    if (!products.length) {
+      document.querySelector('.ribbon-section')?.style.setProperty('display', 'none');
+      return;
+    }
+    document.querySelector('.ribbon-section')?.style.removeProperty('display');
+
+    const picked = pickAcrossCategories(products, 16);
+    const cardHTML = p => {
+      const firstImg = (p.photos?.length ? p.photos[0] : null) || p.colors?.find(c=>c.image)?.image || null;
+      const firstHex = p.colors?.[0]?.hex || p.color || '#c8c4be';
+      const imgHTML = firstImg
+        ? `<img src="${firstImg}" alt="${p.name}">`
+        : `<div style="width:100%;height:100%;background:${firstHex}"></div>`;
+      return `
+        <a class="ribbon-card" href="product.html?id=${p.id}">
+          <div class="ribbon-img-wrap">${imgHTML}</div>
+          <span class="ribbon-cat">${p.category || ''}</span>
+          <span class="ribbon-name">${p.name}</span>
+          <span class="ribbon-price">DA ${(p.price||0).toLocaleString()}</span>
+        </a>`;
+    };
+    // Duplicate the picked set so the CSS loop (-50%) is seamless
+    track.innerHTML = [...picked, ...picked].map(cardHTML).join('');
   }
 
   // ── In-memory map: productId → colors array (avoids huge data-* attributes) ──
@@ -2237,7 +2437,7 @@
           ? `<div class="product-swatches">${colors.map((c, i) =>
                `<span class="product-swatch${i===0?' active':''}"
                   style="background:${c.hex}" title="${(c.name||'').replace(/"/g,'')}"
-                  onclick="switchProductColor(${p.id},${i},this)"></span>`
+                  onclick="event.stopPropagation();switchProductColor(${p.id},${i},this)"></span>`
              ).join('')}</div>`
           : '';
 
@@ -2249,16 +2449,18 @@
           ? `<span class="product-tag sale" style="background:#555">Épuisé</span>`
           : p.tag ? `<span class="product-tag${p.tag==='Sale'?' sale':''}">${p.tag}</span>` : '';
 
+        const prodUrl = `product.html?id=${p.id}`;
         return `
-          <div class="product-card reveal" data-id="${p.id}">
+          <div class="product-card reveal" data-id="${p.id}" style="cursor:pointer" onclick="location.href='${prodUrl}'">
             <div class="product-img-wrap">
               ${imgHTML}${tagHTML}
-              <button class="product-wishlist" id="wl-${p.id}" onclick="toggleWishlist(${p.id},event)">
+              ${p.promo ? `<span class="product-promo">-${p.promo}%</span>` : ''}
+              <button class="product-wishlist" id="wl-${p.id}" onclick="event.stopPropagation();toggleWishlist(${p.id},event)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
               </button>
-              <button class="product-quick-add" onclick="addToCart(${p.id})">Ajouter au panier</button>
+              <button class="product-quick-add" onclick="event.stopPropagation();addToCart(${p.id})">Ajouter au panier</button>
             </div>
             <div class="product-info">
               <span class="product-name">${p.name}</span>
@@ -2316,6 +2518,7 @@
     const existing = cart.find(i => i.id === id);
     if (existing) { existing.qty++; }
     else { cart.push({ ...product, qty: 1 }); }
+    saveCart();
     updateCartUI();
     showNotification(`${product.name} added to bag`);
     openCart();
@@ -2324,6 +2527,7 @@
   function removeFromCart(id) {
     const idx = cart.findIndex(i => i.id === id);
     if (idx > -1) cart.splice(idx, 1);
+    saveCart();
     updateCartUI();
   }
 
@@ -2336,19 +2540,20 @@
     if (count > 0) countEl.classList.add('visible');
     else countEl.classList.remove('visible');
 
-    document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+    document.getElementById('cartTotal').textContent = `DA ${total.toLocaleString()}`;
 
-    const empty = document.getElementById('cartEmpty');
     const footer = document.getElementById('cartFooter');
     const itemsEl = document.getElementById('cartItems');
 
     if (cart.length === 0) {
-      empty.style.display = 'flex';
       footer.style.display = 'none';
-      itemsEl.innerHTML = '';
-      itemsEl.appendChild(empty);
+      itemsEl.innerHTML = `
+        <div class="cart-empty" id="cartEmpty">
+          <div class="cart-empty-icon">○</div>
+          <div class="cart-empty-text">Your wardrobe awaits</div>
+          <div class="cart-empty-sub">Add pieces to begin</div>
+        </div>`;
     } else {
-      empty.style.display = 'none';
       footer.style.display = 'block';
       itemsEl.innerHTML = cart.map(item => {
         const firstImg = item.colors?.find(c => c.image)?.image || null;
@@ -2379,6 +2584,123 @@
     document.getElementById('cartDrawer').classList.remove('open');
     document.getElementById('cartOverlay').classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+  // ─── Site Menu (all pages) ──────────────────────────────────────────────────
+  function renderSiteMenu() {
+    const list = document.getElementById('siteMenuList');
+    if (!list) return;
+    const cats = (siteCategories?.length ? siteCategories : []).map(c =>
+      `<a href="category.html?cat=${encodeURIComponent(c.name)}">${c.name}</a>`
+    ).join('');
+    list.innerHTML = `
+      <a href="index.html">Accueil</a>
+      <div class="site-menu-section">Sélections</div>
+      <a href="category.html?cat=Nouveaut%C3%A9s">Nouveautés</a>
+      <a href="category.html?cat=Promotions">Promotions</a>
+      <a href="category.html?cat=Exclusivit%C3%A9s">Exclusivités</a>
+      <a href="category.html?cat=Id%C3%A9es%20cadeaux">Idées cadeaux</a>
+      <div class="site-menu-section">Catégories</div>
+      ${cats}
+    `;
+  }
+
+  function openSiteMenu() {
+    renderSiteMenu();
+    document.getElementById('siteMenuDrawer').classList.add('open');
+    document.getElementById('siteMenuOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSiteMenu() {
+    document.getElementById('siteMenuDrawer').classList.remove('open');
+    document.getElementById('siteMenuOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ─── Checkout ─────────────────────────────────────────────────────────────────
+  function getDeliveryFee() {
+    const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+    return totalQty >= 2 ? 0 : 500; // Free shipping over 2 products
+  }
+
+  function openCheckout() {
+    if (!cart.length) return;
+    document.getElementById('checkoutBody').style.display = '';
+    document.getElementById('checkoutSuccess').style.display = 'none';
+
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const delivery = getDeliveryFee();
+    const total = subtotal + delivery;
+
+    document.getElementById('checkoutSummary').innerHTML = cart.map(i => `
+      <div class="checkout-summary-item">
+        <span>${i.name} × ${i.qty}</span>
+        <span>DA ${(i.price * i.qty).toLocaleString()}</span>
+      </div>
+    `).join('');
+    document.getElementById('chkSubtotal').textContent = `DA ${subtotal.toLocaleString()}`;
+    document.getElementById('chkDelivery').textContent = delivery === 0 ? 'Gratuite' : `DA ${delivery.toLocaleString()}`;
+    document.getElementById('chkTotal').textContent = `DA ${total.toLocaleString()}`;
+    document.getElementById('chkError').style.display = 'none';
+
+    document.getElementById('checkoutOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkoutOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function submitCheckout() {
+    const name  = document.getElementById('chkName').value.trim();
+    const phone = document.getElementById('chkPhone').value.trim();
+    const city  = document.getElementById('chkCity').value;
+    const err   = document.getElementById('chkError');
+
+    if (!name || !phone || !city) {
+      err.textContent = 'Veuillez remplir tous les champs obligatoires (*)';
+      err.style.display = 'block';
+      return;
+    }
+
+    const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const delivery = getDeliveryFee();
+    const total = subtotal + delivery;
+
+    const order = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      status: 'En attente',
+      items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
+      subtotal,
+      deliveryFee: delivery,
+      total,
+      customer: { prenom: name, nom: '', tel: phone },
+      wilaya: city,
+      adresse: null,
+    };
+
+    try {
+      const orders = JSON.parse(localStorage.getItem('origami_orders') || '[]');
+      orders.unshift(order);
+      localStorage.setItem('origami_orders', JSON.stringify(orders));
+      try { new BroadcastChannel('origami_sync').postMessage({ type: 'origami_order' }); } catch(e) {}
+    } catch(e) {}
+
+    // Send to shared storage so the order reaches the admin from any device
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order),
+    }).catch(e => console.error('Order not synced to server', e));
+
+    cart.length = 0;
+    saveCart();
+    updateCartUI();
+
+    document.getElementById('checkoutBody').style.display = 'none';
+    document.getElementById('checkoutSuccess').style.display = 'block';
   }
 
   // ─── Wishlist ─────────────────────────────────────────────────────────────────
@@ -2527,7 +2849,7 @@
       cartTitle: 'Your Wardrobe', cartEmptyText: 'Your wardrobe awaits',
       cartEmptyAdd: 'Add pieces to begin', subtotalLabel: 'Subtotal',
       checkoutBtn: 'Proceed to Checkout', continueBtn: 'Continue Shopping',
-      marquee: ['New Arrivals 2026','Free Shipping Over DA 15000','Sustainably Crafted','Exclusive Designs'],
+      marquee: ['New Arrivals 2026','Free Shipping Over 2 Products','Sustainably Crafted','Exclusive Designs'],
     },
     fr: {
       dir: 'ltr',
@@ -2563,7 +2885,7 @@
       cartTitle: 'Votre Garde-Robe', cartEmptyText: 'Votre garde-robe vous attend',
       cartEmptyAdd: 'Ajoutez des pièces pour commencer', subtotalLabel: 'Sous-total',
       checkoutBtn: 'Passer à la Caisse', continueBtn: 'Continuer les Achats',
-      marquee: ['Nouveautés 2026','Livraison Gratuite dès 150€','Fabriqué Durablement','Designs Exclusifs'],
+      marquee: ['Nouveautés 2026','Livraison Gratuite dès 2 produits','Fabriqué Durablement','Designs Exclusifs'],
     },
     ar: {
       dir: 'rtl',
@@ -2599,7 +2921,7 @@
       cartTitle: 'خزانة ملابسك', cartEmptyText: 'خزانتك تنتظرك',
       cartEmptyAdd: 'أضيفي قطعاً للبدء', subtotalLabel: 'المجموع الفرعي',
       checkoutBtn: 'المتابعة للدفع', continueBtn: 'مواصلة التسوق',
-      marquee: ['وصل حديثاً 2026','شحن مجاني فوق 150$','صُنع باستدامة','تصاميم حصرية'],
+      marquee: ['وصل حديثاً 2026','شحن مجاني عند شراء منتجين','صُنع باستدامة','تصاميم حصرية'],
     },
   };
 
@@ -2729,13 +3051,32 @@
       </div>`).join('');
   }
 
+  // Pull the shared catalogue from the server (works across every visitor/device)
+  async function syncFromAPI() {
+    try {
+      const res = await fetch('/api/data', { cache: 'no-store' });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      if (fresh && fresh.products) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+        adminData = fresh;
+        siteCategories = fresh.categories?.length ? fresh.categories : siteCategories;
+        applyAdminData(adminData);
+        buildNav(siteCategories);
+        renderCategories(siteCategories);
+      }
+    } catch(e) { /* offline or API unavailable — keep local cache */ }
+  }
+
   // ─── Init ─────────────────────────────────────────────────────────────────────
   buildNav(siteCategories);
   renderCategories(siteCategories);
   applyAdminData(adminData);
   renderProducts();
   updatePromoStrip();
+  updateCartUI();
   observeElements();
+  syncFromAPI();
 </script>
 </body>
 </html>
