@@ -180,7 +180,10 @@
     header,footer{padding:0 1.5rem;}
     .product-page{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
     .thumb-strip{flex-direction:row;width:100%;max-height:none;overflow-x:auto;border-right:none;border-bottom:1px solid var(--grey-light);padding:.8rem 1rem;position:static;}
-    .main-img-wrap{height:70vw;position:static;}
+    .main-img-wrap{height:auto;position:static;}
+    .main-img-placeholder{height:auto;}
+    .main-img-placeholder:not(:has(img)){height:70vw;}
+    .main-img{height:auto;object-fit:contain;}
     .product-info-panel{padding:2rem 1.5rem;}
     .also-grid{grid-template-columns:repeat(2,1fr);}
     .also-like{padding:3rem 1.5rem;}
