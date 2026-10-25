@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ORIGAMI — Produit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --black:#0a0a0a; --white:#f8f6f3;
@@ -178,7 +178,11 @@
   }
   @media(max-width:768px){
     header,footer{padding:0 1.5rem;}
-    .product-page{grid-template-columns:1fr;grid-template-rows:auto auto auto;}
+    html,body{overflow-x:hidden;}
+    .product-page{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;}
+    .product-info-panel{min-width:0;}
+    .tabs-bar{overflow-x:auto;}
+    .tab-btn{padding:.8rem 1rem;white-space:nowrap;}
     .thumb-strip{flex-direction:row;width:100%;max-height:none;overflow-x:auto;border-right:none;border-bottom:1px solid var(--grey-light);padding:.8rem 1rem;position:static;}
     .main-img-wrap{height:auto;position:static;}
     .main-img-placeholder{height:auto;}
@@ -194,6 +198,13 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ARABIC / RTL */
+  html[dir=rtl] body,html[dir=rtl] button,html[dir=rtl] input,html[dir=rtl] select,html[dir=rtl] textarea{font-family:'Tajawal','Josefin Sans',sans-serif;}
+  html[dir=rtl] body *{letter-spacing:0 !important;}
+  html[dir=rtl] .back-btn svg{transform:scaleX(-1);}
+  html[dir=rtl] .price-main,html[dir=rtl] .price-original,html[dir=rtl] .also-price,html[dir=rtl] .summary-price,html[dir=rtl] #fTotal{direction:ltr;unicode-bidi:isolate;}
+  html[dir=rtl] .summary-price,html[dir=rtl] #fTotal{text-align:right;}
 </style>
 </head>
 <body>
@@ -211,18 +222,18 @@
     </a>
     <a href="javascript:history.back()" class="back-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Retour
+      رجوع
     </a>
   </div>
 </header>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
-  <a href="index.html">Accueil</a>
+  <a href="index.html">الرئيسية</a>
   <span>/</span>
-  <a href="javascript:history.back()" id="bcCategory">Catégorie</a>
+  <a href="javascript:history.back()" id="bcCategory">القسم</a>
   <span>/</span>
-  <a href="#" id="bcProduct" style="color:var(--black)">Produit</a>
+  <a href="#" id="bcProduct" style="color:var(--black)">المنتج</a>
 </div>
 
 <!-- PRODUCT PAGE -->
@@ -244,7 +255,7 @@
   <!-- INFO PANEL -->
   <div class="product-info-panel">
     <div id="prodTagWrap"></div>
-    <h1 class="product-title" id="prodTitle">Chargement…</h1>
+    <h1 class="product-title" id="prodTitle">جاري التحميل…</h1>
     <div class="product-brand-line" id="prodBrand">ORIGAMI</div>
 
     <div class="product-price-wrap">
@@ -255,21 +266,21 @@
 
     <!-- COLORS -->
     <div id="colorsSection">
-      <div class="option-label">Couleur <span id="selectedColorName">—</span></div>
+      <div class="option-label">اللون <span id="selectedColorName">—</span></div>
       <div class="colors-row" id="colorsRow"></div>
     </div>
 
     <!-- SIZES -->
     <div id="sizesSection">
       <div class="option-label" style="margin-bottom:.5rem;">
-        Taille <span id="selectedSizeName">—</span>
-        <a href="#" style="font-size:.55rem;letter-spacing:.1em;color:var(--grey-mid);cursor:none;">Guide des tailles</a>
+        المقاس <span id="selectedSizeName">—</span>
+        <a href="#" style="font-size:.55rem;letter-spacing:.1em;color:var(--grey-mid);cursor:none;">دليل المقاسات</a>
       </div>
       <div class="sizes-row" id="sizesRow"></div>
     </div>
 
     <!-- QTY -->
-    <div class="option-label">Quantité</div>
+    <div class="option-label">الكمية</div>
     <div class="qty-wrap">
       <button class="qty-btn" onclick="changeQty(-1)">−</button>
       <input class="qty-num" id="qtyNum" type="number" value="1" min="1" onchange="clampQty()">
@@ -280,11 +291,11 @@
     <div class="action-btns" style="margin-top:1.2rem;">
       <button class="btn-order" onclick="goToOrder()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        Commander maintenant
+        اطلب الآن
       </button>
       <button class="btn-cart" onclick="addedToCart()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Ajouter au panier
+        أضف إلى السلة
       </button>
     </div>
 
@@ -292,40 +303,40 @@
     <div class="delivery-info">
       <div class="delivery-row">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        Livraison dans toute l'Algérie
+        التوصيل لجميع الولايات
       </div>
       <div class="delivery-row">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        Paiement à la livraison disponible
+        الدفع عند الاستلام
       </div>
       <div class="delivery-row">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Retour gratuit sous 7 jours
+        إرجاع مجاني خلال 7 أيام
       </div>
     </div>
 
     <!-- TABS -->
     <div class="tabs-bar">
-      <button class="tab-btn active" onclick="switchTab('desc',this)">Description</button>
-      <button class="tab-btn" onclick="switchTab('mat',this)">Matières</button>
-      <button class="tab-btn" onclick="switchTab('care',this)">Entretien</button>
+      <button class="tab-btn active" onclick="switchTab('desc',this)">الوصف</button>
+      <button class="tab-btn" onclick="switchTab('mat',this)">الخامات</button>
+      <button class="tab-btn" onclick="switchTab('care',this)">العناية</button>
     </div>
     <div class="tab-panel active" id="tab-desc" id="prodDesc">
-      <p id="prodDescText">Description du produit.</p>
+      <p id="prodDescText" dir="auto" style="white-space:pre-line">وصف المنتج.</p>
     </div>
     <div class="tab-panel" id="tab-mat">
       <ul>
-        <li id="mat1">100% coton premium</li>
-        <li id="mat2">Doublure en viscose</li>
-        <li id="mat3">Finitions main</li>
+        <li id="mat1">قطن 100% عالي الجودة</li>
+        <li id="mat2">بطانة من الفيسكوز</li>
+        <li id="mat3">تشطيب يدوي</li>
       </ul>
     </div>
     <div class="tab-panel" id="tab-care">
       <ul>
-        <li>Lavage à 30°C maximum</li>
-        <li>Ne pas utiliser de sèche-linge</li>
-        <li>Repassage à basse température</li>
-        <li>Nettoyage à sec possible</li>
+        <li>غسيل في 30 درجة كحد أقصى</li>
+        <li>لا تستعمل المجفف</li>
+        <li>كيّ بحرارة منخفضة</li>
+        <li>يمكن التنظيف الجاف</li>
       </ul>
     </div>
   </div>
@@ -333,8 +344,8 @@
 
 <!-- YOU MAY ALSO LIKE -->
 <section class="also-like">
-  <div class="section-label">Découvrir</div>
-  <h2 class="section-title">Vous aimerez<br><em>aussi</em></h2>
+  <div class="section-label">اكتشف</div>
+  <h2 class="section-title">قد يعجبك<br><em>أيضاً</em></h2>
   <div class="also-grid" id="alsoGrid"></div>
 </section>
 
@@ -348,19 +359,23 @@
     return null;
   }
 
-  const data = loadData();
-  const allProducts = data?.products || [];
   const prodId = parseInt(params.get('id'));
   const catParam = params.get('cat') || '';
 
-  // Find product or use demo
-  let product = allProducts.find(p => p.id === prodId) || null;
+  let allProducts = [];
+  let product = null;
+  let photos = [];
+  let selectedColor = '';
+  let selectedSize = '';
+  let _renderedJSON = '';
 
-  // Demo product if none found
-  if (!product) {
-    product = {
+  const COLOR_AR = {'blanc':'أبيض','noir':'أسود','bleu ciel':'أزرق سماوي','bleu':'أزرق','beige':'بيج','gris':'رمادي','rouge':'أحمر','vert':'أخضر','rose':'وردي','marron':'بني','bordeaux':'خمري','kaki':'كاكي','jaune':'أصفر','violet':'بنفسجي','orange':'برتقالي','camel':'جملي','crème':'كريمي','creme':'كريمي','marine':'كحلي','bleu marine':'كحلي'};
+  const colorLabel = n => COLOR_AR[(n||'').trim().toLowerCase()] || n;
+
+  function demoProduct() {
+    return {
       id: 0,
-      name: params.get('name') || 'Produit ORIGAMI',
+      name: params.get('name') || 'منتج ORIGAMI',
       brand: 'ORIGAMI',
       price: parseFloat(params.get('price')) || 2500,
       originalPrice: parseFloat(params.get('orig')) || null,
@@ -375,47 +390,8 @@
     };
   }
 
-  // ─── Render Product ────────────────────────────────────────────────────────────
-  document.title = `ORIGAMI — ${product.name}`;
-  document.getElementById('bcProduct').textContent = product.name;
-  if (catParam) document.getElementById('bcCategory').textContent = catParam.replace(/-/g,' ');
-  document.getElementById('prodTitle').textContent = product.name;
-  document.getElementById('prodBrand').textContent = product.brand || 'ORIGAMI';
-
-  // Tag
-  if (product.tag) {
-    const tagEl = document.getElementById('prodTagWrap');
-    tagEl.innerHTML = `<span class="product-tag-top ${product.tag.toLowerCase() === 'sale' ? 'promo' : 'new'}">${product.tag}</span>`;
-  }
-
-  // Promo badge (corner of main image)
-  if (product.promo) {
-    document.getElementById('mainImgWrap').insertAdjacentHTML('beforeend', `<span class="main-img-promo">-${product.promo}%</span>`);
-  }
-
-  // Price
-  document.getElementById('prodPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
-  if (product.originalPrice) {
-    const origEl = document.getElementById('prodOriginal');
-    origEl.textContent = `${product.originalPrice.toLocaleString()} DA`;
-    origEl.style.display = '';
-    const save = Math.round((1 - product.price/product.originalPrice)*100);
-    const saveEl = document.getElementById('prodSave');
-    saveEl.textContent = `-${save}%`;
-    saveEl.style.display = '';
-  }
-
-  // Description
-  if (product.description) document.getElementById('prodDescText').textContent = product.description;
-
-  // ─── Photos / Thumbnails ──────────────────────────────────────────────────────
-  const photos = product.photos?.length ? product.photos : [];
-  const colors = product.colors?.length ? product.colors : [{name:'',hex:'#d4d0ca'}];
-  const thumbStrip = document.getElementById('thumbStrip');
-  const mainWrap = document.getElementById('mainImgEl');
-
   function setMainImage(src, color) {
-    mainWrap.innerHTML = src
+    document.getElementById('mainImgEl').innerHTML = src
       ? `<img src="${src}" class="main-img" alt="${product.name}">`
       : `<div style="width:100%;height:100%;background:${color||'#d4d0ca'};display:flex;align-items:center;justify-content:center;">
            <svg viewBox="0 0 120 120" width="100" height="100" fill="none" opacity=".15">
@@ -423,6 +399,63 @@
            </svg>
          </div>`;
   }
+
+  // Render from a catalogue; returns false if the product isn't in it
+  function renderFrom(data) {
+    const found = (data?.products || []).find(p => p.id === prodId);
+    if (!found) return false;
+    const json = JSON.stringify(found);
+    if (json === _renderedJSON) return true;
+    _renderedJSON = json;
+    allProducts = data.products;
+    product = found;
+    renderProduct();
+    return true;
+  }
+
+  // ─── Render Product ────────────────────────────────────────────────────────────
+  function renderProduct() {
+  document.title = `ORIGAMI — ${product.name}`;
+  document.getElementById('bcProduct').textContent = product.name;
+  if (catParam) document.getElementById('bcCategory').textContent = catParam.replace(/-/g,' ');
+  document.getElementById('prodTitle').textContent = product.name;
+  document.getElementById('prodBrand').textContent = product.brand || 'ORIGAMI';
+
+  // Tag
+  const tagEl = document.getElementById('prodTagWrap');
+  tagEl.innerHTML = product.tag
+    ? `<span class="product-tag-top ${product.tag.toLowerCase() === 'sale' ? 'promo' : 'new'}">${product.tag}</span>`
+    : '';
+
+  // Promo badge (corner of main image)
+  document.querySelectorAll('#mainImgWrap .main-img-promo').forEach(e => e.remove());
+  if (product.promo) {
+    document.getElementById('mainImgWrap').insertAdjacentHTML('beforeend', `<span class="main-img-promo">-${product.promo}%</span>`);
+  }
+
+  // Price
+  document.getElementById('prodPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
+  const origEl = document.getElementById('prodOriginal');
+  const saveEl = document.getElementById('prodSave');
+  if (product.originalPrice) {
+    origEl.textContent = `${product.originalPrice.toLocaleString()} DA`;
+    origEl.style.display = '';
+    const save = Math.round((1 - product.price/product.originalPrice)*100);
+    saveEl.textContent = `-${save}%`;
+    saveEl.style.display = '';
+  } else {
+    origEl.style.display = 'none';
+    saveEl.style.display = 'none';
+  }
+
+  // Description
+  if (product.description) document.getElementById('prodDescText').textContent = product.description;
+
+  // ─── Photos / Thumbnails ──────────────────────────────────────────────────────
+  photos = product.photos?.length ? product.photos : [];
+  const colors = product.colors?.length ? product.colors : [{name:'',hex:'#d4d0ca'}];
+  const thumbStrip = document.getElementById('thumbStrip');
+  thumbStrip.innerHTML = '';
 
   if (photos.length > 0) {
     photos.forEach((src, i) => {
@@ -438,14 +471,14 @@
       const el = document.createElement('div');
       el.className = 'thumb-placeholder' + (i===0?' active':'');
       el.style.background = c.hex;
-      el.title = c.name;
+      el.title = colorLabel(c.name);
       el.onclick = () => {
         document.querySelectorAll('.thumb,.thumb-placeholder').forEach(t=>t.classList.remove('active'));
         el.classList.add('active');
         setMainImage(c.image||null, c.hex);
         // Sync color swatch
         document.querySelectorAll('.color-swatch').forEach((s,j)=>s.classList.toggle('active',j===i));
-        document.getElementById('selectedColorName').textContent = c.name;
+        document.getElementById('selectedColorName').textContent = colorLabel(c.name);
         selectedColor = c.name;
       };
       thumbStrip.appendChild(el);
@@ -454,19 +487,20 @@
   }
 
   // ─── Colors ────────────────────────────────────────────────────────────────────
-  let selectedColor = colors[0]?.name || '';
+  selectedColor = colors[0]?.name || '';
   const colorsRow = document.getElementById('colorsRow');
-  document.getElementById('selectedColorName').textContent = selectedColor;
+  colorsRow.innerHTML = '';
+  document.getElementById('selectedColorName').textContent = colorLabel(selectedColor);
   colors.forEach((c, i) => {
     const sw = document.createElement('button');
     sw.className = 'color-swatch' + (i===0?' active':'');
     sw.style.background = c.hex;
-    sw.title = c.name;
+    sw.title = colorLabel(c.name);
     sw.onclick = () => {
       document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
       sw.classList.add('active');
       selectedColor = c.name;
-      document.getElementById('selectedColorName').textContent = c.name;
+      document.getElementById('selectedColorName').textContent = colorLabel(c.name);
       // Sync thumbnail
       const thumbs = document.querySelectorAll('.thumb,.thumb-placeholder');
       if (thumbs[i]) { thumbs.forEach(t=>t.classList.remove('active')); thumbs[i].classList.add('active'); }
@@ -476,9 +510,11 @@
   });
 
   // ─── Sizes ─────────────────────────────────────────────────────────────────────
-  let selectedSize = '';
+  selectedSize = '';
+  document.getElementById('selectedSizeName').textContent = '—';
   const tailles = product.tailles?.length ? product.tailles : ['XS','S','M','L','XL'];
   const sizesRow = document.getElementById('sizesRow');
+  sizesRow.innerHTML = '';
   tailles.forEach(t => {
     const btn = document.createElement('button');
     btn.className = 'size-btn';
@@ -491,6 +527,9 @@
     };
     sizesRow.appendChild(btn);
   });
+
+  renderAlso();
+  }
 
   // ─── Quantity ─────────────────────────────────────────────────────────────────
   function changeQty(d) {
@@ -513,6 +552,7 @@
   // ─── Add to cart ──────────────────────────────────────────────────────────────
   const CART_KEY = 'origami_cart';
   function addedToCart() {
+    if (!product) return;
     const qty = parseInt(document.getElementById('qtyNum').value) || 1;
     try {
       const cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
@@ -522,7 +562,7 @@
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
       try { new BroadcastChannel('origami_sync').postMessage({ type: 'origami_cart' }); } catch(e) {}
     } catch(e) {}
-    notify(`${product.name} ajouté au panier`);
+    notify(`تمت إضافة ${product.name} إلى السلة`);
   }
 
   // ─── Go to order page ────────────────────────────────────────────────────────
@@ -539,10 +579,18 @@
 
   // ─── Also Like ────────────────────────────────────────────────────────────────
   // Prioritize same category, then fill with others
-  const samecat = allProducts.filter(p => p.id !== prodId && p.category === product.category);
-  const others  = allProducts.filter(p => p.id !== prodId && p.category !== product.category);
-  const alsoProducts = [...samecat, ...others].slice(0, 5);
-  const alsoGrid = document.getElementById('alsoGrid');
+  function renderAlso() {
+    const samecat = allProducts.filter(p => p.id !== prodId && p.category === product.category);
+    const others  = allProducts.filter(p => p.id !== prodId && p.category !== product.category);
+    const alsoProducts = [...samecat, ...others].slice(0, 5);
+    const alsoSection = document.querySelector('.also-like');
+    if (alsoProducts.length > 0) {
+      document.getElementById('alsoGrid').innerHTML = alsoProducts.map(renderAlsoCard).join('');
+      alsoSection.style.display = '';
+    } else {
+      alsoSection.style.display = 'none';
+    }
+  }
 
   function renderAlsoCard(p) {
     const firstPhoto = p.photos?.[0] || p.colors?.find(c=>c.image)?.image || null;
@@ -562,19 +610,13 @@
       <div class="also-card" onclick="location.href='product.html?id=${p.id}&cat=${encodeURIComponent(p.category||'')}'" style="cursor:none">
         <div class="also-img-wrap">
           ${imgHTML}${tagBadge}
-          <button class="also-quick" onclick="event.stopPropagation();location.href='product.html?id=${p.id}'">Voir le produit →</button>
+          <button class="also-quick" onclick="event.stopPropagation();location.href='product.html?id=${p.id}'">شاهد المنتج ←</button>
         </div>
         <div class="also-info">
           <span class="also-name">${p.name}</span>
           <span class="also-price">${priceHTML}</span>
         </div>
       </div>`;
-  }
-
-  if (alsoProducts.length > 0) {
-    alsoGrid.innerHTML = alsoProducts.map(renderAlsoCard).join('');
-  } else {
-    document.querySelector('.also-like').style.display = 'none';
   }
 
   // ─── Notification ─────────────────────────────────────────────────────────────
@@ -593,32 +635,10 @@
       const raw = localStorage.getItem('origami_data');
       if (!raw || raw === _syncLast) return;
       _syncLast = raw;
-      const d = JSON.parse(raw);
-      const updated = (d.products || []).find(p => p.id === prodId);
-      if (!updated) return;
+      const before = _renderedJSON;
+      if (!renderFrom(JSON.parse(raw)) || !before || before === _renderedJSON) return;
 
-      // Update price
-      document.getElementById('prodPrice').textContent = `${(updated.price||0).toLocaleString()} DA`;
-      const origEl = document.getElementById('prodOriginal');
-      const saveEl = document.getElementById('prodSave');
-      if (updated.originalPrice) {
-        origEl.textContent = `${updated.originalPrice.toLocaleString()} DA`;
-        origEl.style.display = '';
-        saveEl.textContent = `-${Math.round((1-updated.price/updated.originalPrice)*100)}%`;
-        saveEl.style.display = '';
-      } else {
-        origEl.style.display = 'none';
-        saveEl.style.display = 'none';
-      }
-
-      // Update title & brand
-      document.getElementById('prodTitle').textContent = updated.name;
-      document.getElementById('prodBrand').textContent = updated.brand || 'ORIGAMI';
-
-      // Update description
-      if (updated.description) document.getElementById('prodDescText').textContent = updated.description;
-
-      // Show sync badge
+      // Show sync badge (only when an already-displayed product changed)
       let b = document.getElementById('syncBadge');
       if (!b) {
         b = document.createElement('div');
@@ -626,7 +646,7 @@
         b.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;background:#0a0a0a;color:#f8f6f3;padding:.5rem 1rem;font-family:"Josefin Sans",sans-serif;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;z-index:9000;opacity:0;transition:opacity .4s;pointer-events:none;';
         document.body.appendChild(b);
       }
-      b.textContent = '● Produit mis à jour';
+      b.textContent = '● تم تحديث المنتج';
       b.style.opacity = '1';
       clearTimeout(b._t);
       b._t = setTimeout(() => b.style.opacity = '0', 2500);
@@ -650,17 +670,20 @@
   });
   window.addEventListener('focus', syncProduct);
 
-  // Pull the shared catalogue from the server (works across every visitor/device)
+  // Show the cached copy right away (returning visitors), then pull the shared
+  // catalogue from the server — first-time visitors (e.g. from an ad) have no cache.
+  renderFrom(loadData());
   (async function syncFromAPI() {
+    let fresh = null;
     try {
       const res = await fetch('/api/data', { cache: 'no-store' });
-      if (!res.ok) return;
-      const fresh = await res.json();
-      if (fresh && fresh.products) {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh)); } catch(e) {}
-        syncProduct();
-      }
+      if (res.ok) fresh = await res.json();
     } catch(e) { /* offline or API unavailable — keep local cache */ }
+    if (fresh && fresh.products) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh)); _syncLast = localStorage.getItem(STORAGE_KEY); } catch(e) {}
+      if (renderFrom(fresh)) return;
+    }
+    if (!product) { product = demoProduct(); renderProduct(); }
   })();
 
   // ─── Cursor ───────────────────────────────────────────────────────────────────

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ORIGAMI — Commander</title>
+<title>ORIGAMI — الطلب</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@100;300;400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --black:#0a0a0a; --white:#f8f6f3;
@@ -51,6 +51,7 @@
   .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--black);}
   .form-textarea{resize:vertical;min-height:80px;}
   .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b0aba3' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;}
+  html[dir=rtl] .form-select{background-position:left 1rem center;}
 
   .btn-confirm{width:100%;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-family:'Josefin Sans',sans-serif;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:background .3s;display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:1rem;}
   .btn-confirm:hover{background:#333;}
@@ -73,6 +74,13 @@
     .summary{position:static;}
     .form-row{grid-template-columns:1fr;}
   }
+
+  /* ARABIC / RTL */
+  html[dir=rtl] body,html[dir=rtl] button,html[dir=rtl] input,html[dir=rtl] select,html[dir=rtl] textarea{font-family:'Tajawal','Josefin Sans',sans-serif;}
+  html[dir=rtl] body *{letter-spacing:0 !important;}
+  html[dir=rtl] .back-btn svg{transform:scaleX(-1);}
+  html[dir=rtl] .price-main,html[dir=rtl] .price-original,html[dir=rtl] .also-price,html[dir=rtl] .summary-price,html[dir=rtl] #fTotal{direction:ltr;unicode-bidi:isolate;}
+  html[dir=rtl] .summary-price,html[dir=rtl] #fTotal{text-align:right;}
 </style>
 </head>
 <body>
@@ -87,7 +95,7 @@
     </a>
     <a href="javascript:history.back()" class="back-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      Retour
+      رجوع
     </a>
   </div>
 </header>
@@ -105,110 +113,153 @@
 
   <!-- FORM -->
   <div id="orderForm">
-    <div class="form-title">Commander</div>
-    <div class="form-subtitle">Remplissez vos informations de livraison</div>
+    <div class="form-title">اطلب الآن</div>
+    <div class="form-subtitle">املأ معلومات التوصيل — الدفع عند الاستلام</div>
 
-    <div class="form-divider">Informations personnelles</div>
+    <div class="form-divider">المعلومات الشخصية</div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Prénom *</label>
-        <input class="form-input" id="fPrenom" type="text" placeholder="Votre prénom" required>
+        <label class="form-label">الاسم *</label>
+        <input class="form-input" id="fPrenom" type="text" placeholder="اسمك" required>
       </div>
       <div class="form-group">
-        <label class="form-label">Nom *</label>
-        <input class="form-input" id="fNom" type="text" placeholder="Votre nom" required>
+        <label class="form-label">اللقب *</label>
+        <input class="form-input" id="fNom" type="text" placeholder="لقبك" required>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Téléphone *</label>
-        <input class="form-input" id="fTel" type="tel" placeholder="06 XX XX XX XX" required>
+        <label class="form-label">رقم الهاتف *</label>
+        <input class="form-input" id="fTel" type="tel" placeholder="06 XX XX XX XX" dir="ltr" required>
       </div>
       <div class="form-group">
-        <label class="form-label">WhatsApp</label>
-        <input class="form-input" id="fWa" type="tel" placeholder="(si différent)">
+        <label class="form-label">واتساب</label>
+        <input class="form-input" id="fWa" type="tel" placeholder="(إذا كان مختلفاً)" dir="ltr">
       </div>
     </div>
 
-    <div class="form-divider">Adresse de livraison</div>
+    <div class="form-divider">عنوان التوصيل</div>
     <div class="form-row full">
       <div class="form-group">
-        <label class="form-label">Wilaya *</label>
+        <label class="form-label">الولاية *</label>
         <select class="form-select" id="fWilaya">
-          <option value="">— Choisir la wilaya —</option>
-          <option>Alger</option><option>Oran</option><option>Constantine</option>
-          <option>Annaba</option><option>Blida</option><option>Batna</option>
-          <option>Sétif</option><option>Sidi Bel Abbès</option><option>Biskra</option>
-          <option>Tébessa</option><option>Tlemcen</option><option>Béjaïa</option>
-          <option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
-          <option>Mascara</option><option>Ouargla</option><option>Tizi Ouzou</option>
-          <option>Jijel</option><option>Skikda</option><option>Guelma</option>
-          <option>Chlef</option><option>Laghouat</option><option>Oum El Bouaghi</option>
-          <option>Tiaret</option><option>Bejaia</option><option>Bordj Bou Arreridj</option>
-          <option>Boumerdès</option><option>El Tarf</option><option>Tissemsilt</option>
-          <option>El Oued</option><option>Khenchela</option><option>Souk Ahras</option>
-          <option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
-          <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option>
-          <option>Relizane</option><option>Timimoun</option><option>Bordj Badji Mokhtar</option>
-          <option>Ouled Djellal</option><option>Béni Abbès</option><option>In Salah</option>
-          <option>In Guezzam</option><option>Touggourt</option><option>Djanet</option>
-          <option>El M'Ghair</option><option>El Meniaa</option>
+          <option value="">— اختر الولاية —</option>
+          <option value="Adrar">01 - أدرار</option>
+          <option value="Chlef">02 - الشلف</option>
+          <option value="Laghouat">03 - الأغواط</option>
+          <option value="Oum El Bouaghi">04 - أم البواقي</option>
+          <option value="Batna">05 - باتنة</option>
+          <option value="Béjaïa">06 - بجاية</option>
+          <option value="Biskra">07 - بسكرة</option>
+          <option value="Béchar">08 - بشار</option>
+          <option value="Blida">09 - البليدة</option>
+          <option value="Bouira">10 - البويرة</option>
+          <option value="Tamanrasset">11 - تمنراست</option>
+          <option value="Tébessa">12 - تبسة</option>
+          <option value="Tlemcen">13 - تلمسان</option>
+          <option value="Tiaret">14 - تيارت</option>
+          <option value="Tizi Ouzou">15 - تيزي وزو</option>
+          <option value="Alger">16 - الجزائر</option>
+          <option value="Djelfa">17 - الجلفة</option>
+          <option value="Jijel">18 - جيجل</option>
+          <option value="Sétif">19 - سطيف</option>
+          <option value="Saïda">20 - سعيدة</option>
+          <option value="Skikda">21 - سكيكدة</option>
+          <option value="Sidi Bel Abbès">22 - سيدي بلعباس</option>
+          <option value="Annaba">23 - عنابة</option>
+          <option value="Guelma">24 - قالمة</option>
+          <option value="Constantine">25 - قسنطينة</option>
+          <option value="Médéa">26 - المدية</option>
+          <option value="Mostaganem">27 - مستغانم</option>
+          <option value="M'Sila">28 - المسيلة</option>
+          <option value="Mascara">29 - معسكر</option>
+          <option value="Ouargla">30 - ورقلة</option>
+          <option value="Oran">31 - وهران</option>
+          <option value="El Bayadh">32 - البيض</option>
+          <option value="Illizi">33 - إليزي</option>
+          <option value="Bordj Bou Arreridj">34 - برج بوعريريج</option>
+          <option value="Boumerdès">35 - بومرداس</option>
+          <option value="El Tarf">36 - الطارف</option>
+          <option value="Tindouf">37 - تندوف</option>
+          <option value="Tissemsilt">38 - تيسمسيلت</option>
+          <option value="El Oued">39 - الوادي</option>
+          <option value="Khenchela">40 - خنشلة</option>
+          <option value="Souk Ahras">41 - سوق أهراس</option>
+          <option value="Tipaza">42 - تيبازة</option>
+          <option value="Mila">43 - ميلة</option>
+          <option value="Aïn Defla">44 - عين الدفلى</option>
+          <option value="Naâma">45 - النعامة</option>
+          <option value="Aïn Témouchent">46 - عين تموشنت</option>
+          <option value="Ghardaïa">47 - غرداية</option>
+          <option value="Relizane">48 - غليزان</option>
+          <option value="Timimoun">49 - تيميمون</option>
+          <option value="Bordj Badji Mokhtar">50 - برج باجي مختار</option>
+          <option value="Ouled Djellal">51 - أولاد جلال</option>
+          <option value="Béni Abbès">52 - بني عباس</option>
+          <option value="In Salah">53 - عين صالح</option>
+          <option value="In Guezzam">54 - عين قزام</option>
+          <option value="Touggourt">55 - تقرت</option>
+          <option value="Djanet">56 - جانت</option>
+          <option value="El M'Ghair">57 - المغير</option>
+          <option value="El Meniaa">58 - المنيعة</option>
         </select>
       </div>
     </div>
     <div class="form-row full">
       <div class="form-group">
-        <label class="form-label">Adresse complète *</label>
-        <input class="form-input" id="fAdresse" type="text" placeholder="Rue, quartier, commune…" required>
+        <label class="form-label">العنوان الكامل *</label>
+        <input class="form-input" id="fAdresse" type="text" placeholder="البلدية، الحي، الشارع…" required>
       </div>
     </div>
 
-    <div class="form-divider">Détails de la commande</div>
+    <div class="form-divider">تفاصيل الطلب</div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Couleur</label>
+        <label class="form-label">اللون</label>
         <select class="form-select" id="fColor"></select>
       </div>
       <div class="form-group">
-        <label class="form-label">Taille</label>
+        <label class="form-label">المقاس</label>
         <select class="form-select" id="fSize"></select>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Quantité</label>
+        <label class="form-label">الكمية</label>
         <input class="form-input" id="fQty" type="number" min="1" value="1">
       </div>
       <div class="form-group">
-        <label class="form-label">Total estimé</label>
+        <label class="form-label">المجموع</label>
         <input class="form-input" id="fTotal" type="text" readonly>
       </div>
     </div>
     <div class="form-row full">
       <div class="form-group">
-        <label class="form-label">Note (optionnel)</label>
-        <textarea class="form-textarea" id="fNote" placeholder="Précisions sur votre commande…"></textarea>
+        <label class="form-label">ملاحظة (اختياري)</label>
+        <textarea class="form-textarea" id="fNote" placeholder="تفاصيل إضافية حول طلبك…"></textarea>
       </div>
     </div>
 
     <button class="btn-confirm" onclick="submitOrder()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg>
-      Confirmer la commande
+      تأكيد الطلب
     </button>
   </div>
 
   <!-- SUCCESS -->
   <div class="order-success" id="orderSuccess">
     <div class="success-icon">✓</div>
-    <div class="success-title">Commande reçue !</div>
-    <p class="success-sub">Merci pour votre confiance.<br>Notre équipe vous contactera sous 24h pour confirmer.</p>
-    <a href="index.html" class="btn-order">Continuer mes achats</a>
+    <div class="success-title">تم استلام طلبك!</div>
+    <p class="success-sub">شكراً على ثقتك.<br>سيتصل بك فريقنا خلال 24 ساعة لتأكيد الطلب.</p>
+    <a href="index.html" class="btn-order">مواصلة التسوق</a>
   </div>
 
 </div>
 
 <script>
 const STORAGE_KEY = 'origami_data';
+const COLOR_AR = {'blanc':'أبيض','noir':'أسود','bleu ciel':'أزرق سماوي','bleu':'أزرق','beige':'بيج','gris':'رمادي','rouge':'أحمر','vert':'أخضر','rose':'وردي','marron':'بني','bordeaux':'خمري','kaki':'كاكي','jaune':'أصفر','violet':'بنفسجي','orange':'برتقالي','camel':'جملي','crème':'كريمي','creme':'كريمي','marine':'كحلي','bleu marine':'كحلي'};
+const colorLabel = n => COLOR_AR[(n||'').trim().toLowerCase()] || n;
 
 function loadData() {
   try { const s = localStorage.getItem(STORAGE_KEY); if (s) return JSON.parse(s); } catch(e) {}
@@ -248,8 +299,8 @@ let product = null;
   if (!product) {
     document.getElementById('page').innerHTML = `
       <div class="order-success show" style="padding:6rem 2rem;">
-        <div class="success-title">Produit introuvable</div>
-        <a href="index.html" class="btn-order">Retour à la boutique</a>
+        <div class="success-title">المنتج غير موجود</div>
+        <a href="index.html" class="btn-order">العودة إلى المتجر</a>
       </div>`;
     return;
   }
@@ -280,17 +331,17 @@ let product = null;
   };
 
   document.getElementById('summaryName').textContent = product.name;
-  document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+  document.getElementById('summaryDetail').textContent = [colorLabel(selectedColor), selectedSize, `الكمية: ${qty}`].filter(Boolean).join(' · ');
   document.getElementById('summaryPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
 
   const updateSummary = () => {
-    document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+    document.getElementById('summaryDetail').textContent = [colorLabel(selectedColor), selectedSize, `الكمية: ${qty}`].filter(Boolean).join(' · ');
   };
   const fillSelect = (id, options, current, onChange) => {
     const el = document.getElementById(id);
     const list = options.slice();
     if (current && !list.includes(current)) list.unshift(current);
-    el.innerHTML = '<option value="">— Choisir —</option>' + list.map(o => `<option value="${o}">${o}</option>`).join('');
+    el.innerHTML = '<option value="">— اختر —</option>' + list.map(o => `<option value="${o}">${colorLabel(o)}</option>`).join('');
     el.value = current;
     el.addEventListener('change', () => { onChange(el.value); updateSummary(); });
   };
@@ -302,7 +353,7 @@ let product = null;
   document.getElementById('fQty').addEventListener('input', () => {
     qty = parseInt(document.getElementById('fQty').value) || 1;
     document.getElementById('fTotal').value = `${(product.price * qty).toLocaleString()} DA`;
-    document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+    document.getElementById('summaryDetail').textContent = [colorLabel(selectedColor), selectedSize, `الكمية: ${qty}`].filter(Boolean).join(' · ');
   });
 })();
 
@@ -316,7 +367,7 @@ function submitOrder() {
   const note    = document.getElementById('fNote').value.trim();
 
   if (!prenom || !nom || !tel || !wilaya || !adresse) {
-    notify('Veuillez remplir tous les champs obligatoires (*)');
+    notify('يرجى ملء جميع الخانات الإجبارية (*)');
     return;
   }
 
