@@ -1791,8 +1791,11 @@ const _bc = (() => { try { return new BroadcastChannel('origami_sync'); } catch(
 
 async function save(state) {
   try {
+    await migrateInlineImages(state);
     const json = JSON.stringify(state);
-    localStorage.setItem('origami_data', json);
+    // The local copy is only a cache — a full localStorage must not block the online save
+    try { localStorage.setItem('origami_data', json); }
+    catch(e) { localStorage.removeItem('origami_data'); }
     // Broadcast to all open site tabs instantly (same device)
     if (_bc) _bc.postMessage({ type: 'origami_update', ts: Date.now() });
     document.getElementById('saveStatus').textContent = '⏳ Synchronisation…';
@@ -1831,7 +1834,7 @@ async function syncStateFromAPI() {
     const fresh = await res.json();
     if (fresh && fresh.products) {
       state = fresh;
-      localStorage.setItem('origami_data', JSON.stringify(state));
+      try { localStorage.setItem('origami_data', JSON.stringify(state)); } catch(e) {}
       renderPage(document.querySelector('.page.active')?.id?.replace('page-', '') || 'dashboard');
       renderDashboard();
     }
@@ -2280,11 +2283,38 @@ function compressImage(file, callback) {
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      callback(canvas.toDataURL('image/jpeg', 0.82));
+      // WebP is ~30% smaller than JPEG; browsers that can't encode it return PNG, so fall back
+      let dataUrl = canvas.toDataURL('image/webp', 0.8);
+      if (!dataUrl.startsWith('data:image/webp')) dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      uploadImage(dataUrl).then(callback);
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+// Upload a data: URL to /api/image and resolve with its short URL.
+// Falls back to the data: URL if the API is unreachable (e.g. local static server).
+async function uploadImage(dataUrl) {
+  try {
+    const res = await fetch('/api/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': getAdminSecret() },
+      body: JSON.stringify({ dataUrl }),
+    });
+    if (res.ok) return (await res.json()).url;
+  } catch(e) {}
+  return dataUrl;
+}
+
+// Replace every inline base64 image left in the state with an uploaded URL
+async function migrateInlineImages(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    if (typeof v === 'string' && v.startsWith('data:image/')) obj[k] = await uploadImage(v);
+    else if (v && typeof v === 'object') await migrateInlineImages(v);
+  }
 }
 
 // ── OPEN / SAVE PRODUCT ───────────────────────────────

@@ -758,7 +758,7 @@ async function syncFromAPI() {
     if (!res.ok) return;
     const fresh = await res.json();
     if (fresh && fresh.products) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh)); } catch(e) {}
       renderProducts();
     }
   } catch(e) { /* offline or API unavailable — keep local cache */ }

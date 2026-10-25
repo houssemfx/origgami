@@ -167,11 +167,11 @@
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Couleur</label>
-        <input class="form-input" id="fColor" type="text" readonly>
+        <select class="form-select" id="fColor"></select>
       </div>
       <div class="form-group">
         <label class="form-label">Taille</label>
-        <input class="form-input" id="fSize" type="text" readonly>
+        <select class="form-select" id="fSize"></select>
       </div>
     </div>
     <div class="form-row">
@@ -238,7 +238,7 @@ let product = null;
   try {
     const res = await fetch('/api/data', { cache: 'no-store' });
     data = res.ok ? await res.json() : null;
-    if (data) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    try { if (data) localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   } catch(e) { /* offline */ }
   if (!data) data = loadData();
 
@@ -283,8 +283,19 @@ let product = null;
   document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
   document.getElementById('summaryPrice').textContent = `${(product.price||0).toLocaleString()} DA`;
 
-  document.getElementById('fColor').value = selectedColor;
-  document.getElementById('fSize').value = selectedSize;
+  const updateSummary = () => {
+    document.getElementById('summaryDetail').textContent = [selectedColor, selectedSize, `Qté: ${qty}`].filter(Boolean).join(' · ');
+  };
+  const fillSelect = (id, options, current, onChange) => {
+    const el = document.getElementById(id);
+    const list = options.slice();
+    if (current && !list.includes(current)) list.unshift(current);
+    el.innerHTML = '<option value="">— Choisir —</option>' + list.map(o => `<option value="${o}">${o}</option>`).join('');
+    el.value = current;
+    el.addEventListener('change', () => { onChange(el.value); updateSummary(); });
+  };
+  fillSelect('fColor', (product.colors || []).map(c => c.name).filter(Boolean), selectedColor, v => { selectedColor = v; });
+  fillSelect('fSize', product.tailles?.length ? product.tailles : ['XS','S','M','L','XL'], selectedSize, v => { selectedSize = v; });
   document.getElementById('fQty').value = qty;
   document.getElementById('fTotal').value = `${(product.price * qty).toLocaleString()} DA`;
 
