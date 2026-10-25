@@ -1811,7 +1811,10 @@ async function save(state) {
       document.getElementById('saveStatus').textContent = '✓ Live sur le site · ' + t;
     } else {
       document.getElementById('saveStatus').textContent = '⚠ Sauvegardé localement seulement · ' + t;
-      toast('Non synchronisé avec le site en ligne (sauvegardé sur cet appareil)', 'error');
+      const why = res.status === 401 ? 'session expirée, reconnectez-vous'
+                : res.status === 413 ? 'données trop volumineuses'
+                : 'erreur ' + res.status;
+      toast('Non synchronisé avec le site en ligne (' + why + ')', 'error');
     }
   } catch(e) {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
@@ -2303,7 +2306,11 @@ async function uploadImage(dataUrl) {
       body: JSON.stringify({ dataUrl }),
     });
     if (res.ok) return (await res.json()).url;
-  } catch(e) {}
+    if (res.status === 401) toast('⚠ Session expirée — reconnectez-vous puis réessayez', 'error');
+    else toast('⚠ Échec de l\'envoi de l\'image (erreur ' + res.status + ')', 'error');
+  } catch(e) {
+    toast('⚠ Échec de l\'envoi de l\'image (réseau)', 'error');
+  }
   return dataUrl;
 }
 
